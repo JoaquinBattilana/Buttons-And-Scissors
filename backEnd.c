@@ -1,8 +1,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+
 #define INC_MAX 4
 #define VACIO 0
+
+#define MAX(a, b) a>b? a : b
+#define MIN(a, b) a<b? a : b
 
 //enum errores {ERROR=0, E_MEM_DIN, E_FORMATO,E_};
 typedef struct
@@ -26,27 +30,27 @@ int hayMovimientosValidos(matriz_t tablero) //chequea luego de cada turno para s
     int i=0, j=0;
     while(i<tablero.n && j<tablero.n && !flag)
     {
-        if((c = v[i][j]) != VACIO)
+        if((c = tablero.v[i][j]) != VACIO)
         {
             punto_t pos = {i, j};
             flag = buscarBoton(tablero, pos, c);
         }
-        
-        if(++j == n)
+
+        if(++j == tablero.n)
         {
             i++;
             j=0;
         }
     }
-    
+
     return flag;
 }
 
 int buscarBoton(matriz_t tablero, punto_t pos, char boton)
 {
-    flag = 0;
+    int flag = 0;
     int i;
-    
+
     for(i=0; i<INC_MAX && !flag; i++)
     {
         punto_t direccion = {dir_inc[i][0], dir_inc[i][1]};
@@ -60,7 +64,7 @@ int buscarBoton(matriz_t tablero, punto_t pos, char boton)
 
 int esMovimientoValido(matriz_t tablero, punto_t pos, punto_t p1, punto_t p2, punto_t dir, char boton)
 {
-    flag = 0;
+    int flag = 0;
     int i,j;
     char c;
     int minFil, maxFil, minCol, maxCol;
@@ -73,7 +77,7 @@ int esMovimientoValido(matriz_t tablero, punto_t pos, punto_t p1, punto_t p2, pu
         else if(c == boton)
             flag = 1;
     }
-    
+
     return flag % 2; //para que en caso de el flag ser 2, retorne 0
 }
 
@@ -92,7 +96,7 @@ int realizarCorte(matriz_t tablero, punto_t origen, punto_t destino, punto_t dir
 {
     int i,j;
     int botonesCortados = 0;
-    
+
     for(i=origen.x, j=origen.y; i != destino.x && j != destino.y; i+=dir.x, j+=dir.y)
     {
         if(tablero.v[i][j] != VACIO)
@@ -101,16 +105,15 @@ int realizarCorte(matriz_t tablero, punto_t origen, punto_t destino, punto_t dir
             botonesCortados++;
         }
     }
-    
+
     return botonesCortados;
 }
 
 void puntoMaxMin(punto_t p1, punto_t p2, int * minFil, int * maxFil, int * minCol, int * maxCol)
 {
-    *minFil = min(p1.x, p2.x);
-    *maxFil = max(pi.x, p2.x);
-    *minCol = min(p1.y, p2.y);
-    *maxCol = max(pi.y, p2.y);
+    *minFil = MIN(p1.x, p2.x);
+    *maxFil = MAX(p2.x, p2.x);
+    *minCol = MIN(p1.y, p2.y);
+    *maxCol = MAX(p2.y, p2.y);
     return;
 }
-
