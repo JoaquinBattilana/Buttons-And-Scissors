@@ -56,7 +56,7 @@ int buscarBoton(matriz_t tablero, punto_t pos, char boton)
         punto_t direccion = {dir_inc[i][0], dir_inc[i][1]};
         punto_t punto1 = {0,0};
         punto_t punto2 = {tablero.n-1,tablero.n-1};
-        flag = esMovimientoValido(tablero, punto1, punto1, punto2, direccion, boton);
+        flag = esMovimientoValido(tablero, pos, punto1, punto2, direccion, boton);
     }
 
     return flag;
@@ -105,6 +105,9 @@ int realizarCorte(matriz_t tablero, punto_t origen, punto_t destino, punto_t dir
             botonesCortados++;
         }
     }
+
+    tablero.v[i][j] = VACIO;
+    botonesCortados++;
 
     return botonesCortados;
 }
