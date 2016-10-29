@@ -3,12 +3,9 @@
 
 int main(void)
 {
-    menu();
-
-    //blah blah blah
-    //codigo codigo codido
-    //paja
-
+    int opcion;
+    opcion=menu();
+    
 
     return 0;
 }
