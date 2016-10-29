@@ -28,52 +28,54 @@ int validar_volvermenu(void){
 
 int main(void)
 {
-    size_t opcion, dim, flag = 1, turno;
+    size_t opcion, dim, flag = 1, turno, flag_2 = 1;
     matriz_t tablero;
     opcion = menu();
     jugador jugadores[2];
     char caracter, caracter_final;
-    while(flag){
-        
-    switch(opcion){
-        case JVSJ:
-        case JVSCPU:{
-            tablero.n = validar_dim();
-            tablero.v = matrizDsdArchivo(tableronn);
-            jugadores[0].botones_cortados = jugadores[1].botones_cortados = 0;
-            jugadores[0].esPC = 0;
-            juagadores[1].esPC = (opcion == JVSCPU)? 1 : 0;
-            randomize();
-            turno = randInt(0,1);
-            break;
-        }
-        case CARGAR:{
+    while(flag_2){
+            switch(opcion){
+                case JVSJ:
+                case JVSCPU:{
+                  tablero.n = validar_dim();
+                  tablero.v = matrizDsdArchivo(tableronn);
+                  jugadores[0].botones_cortados = jugadores[1].botones_cortados = 0;
+                  jugadores[0].esPC = 0;
+                  juagadores[1].esPC = (opcion == JVSCPU)? 1 : 0;
+                  randomize();
+                  turno = randInt(0,1);
+                  break;
+                }
+                case CARGAR:{
             
-            break;
-        }
-        case SALIR:{
-            flag = 0;
-        }
+                break;
+                }
+                case SALIR:{
+                flag = 0;
+                flag_2 = 2;
+                }
+            }
+            while(flag){
+                printf("Botones J1: %d, J2: %d\n", jugadores[0].botones_cortados, jugadores[1].botones_cortados);
+                PRINTEO TABLERO;
+                printf("Turno jugador %d\n", turno+1);
+                switch(jugadores[turno].esPC){
+                    case 0:{
+                        leermovimiento(mov, tablero.n, tablero.v);                                   \\NO CREE LA VARIABLE MOV PORQUE NOSE COMO LO IBAMOS A HACER
+                        jugadores[turno].botones_cortados = realizarcorte(tablero, ALGO, ALGO, ALGO) \\NOSE COMO LO IBAMOS A HACER
+                    }
+                    case 1:{
+                        FUNCION MOV MAQUINA
+                    }
+                }
+                if((hayMovimientosValidos(tablero))!){
+                    printf("Gano el jugador %d\n", turno+1);
+                    liberarMatrizCuadrada(tablero.v,tablero.n);
+                    flag_2 = validar_volvermenu();
+                }
+                else
+                    turno = (turno + 1) % 2;
+            }
     }
-    while(flag){
-        printf("Botones J1: %d, J2: %d\n", jugadores[0].botones_cortados, jugadores[1].botones_cortados);
-        PRINTEO TABLERO;
-        printf("Turno jugador %d\n", turno+1);
-        switch(jugadores[turno].esPC){
-            case 0:{
-                leermovimiento(mov, tablero.n, tablero.v);                                   \\NO CREE LA VARIABLE MOV PORQUE NOSE COMO LO IBAMOS A HACER
-                jugadores[turno].botones_cortados = realizarcorte(tablero, ALGO, ALGO, ALGO) \\NOSE COMO LO IBAMOS A HACER
-            }
-            case 1:{
-                FUNCION MOV MAQUINA
-            }
-        if((hayMovimientosValidos(tablero))!){
-            printf("Gano el jugador %d\n", turno+1);
-            liberarMatrizCuadrada(tablero.v,tablero.n);
-            flag = validar_volvermenu();
-        }
-        else
-            turno = (turno + 1) % 2;
-        }
     return 0;
 }
