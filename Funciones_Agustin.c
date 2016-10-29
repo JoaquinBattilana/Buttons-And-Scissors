@@ -9,7 +9,7 @@ typedef struct
 } movimiento;
 
 
-void leer_movimiento(movimiento * mov, unsigned int dim, char ** matriz)
+void leer_movimiento(movimiento * mov, size_t dim, char ** matriz)
 {
  char estado, ultimo_caracter, flag = 1, caracter, caracter_final;
  do
