@@ -77,23 +77,24 @@ int validar(movimiento * mov, unsigned int dim, char ** matriz)
     {
         flag = 1;
         printf("No existe la posición:[%d,%d]\n", mov->incial[0], mov->incial[1]);
-        if (!flag && mov->final[0] > dim && mov->final[1] > dim)
-        {
-            flag = 1;
-            printf("No existe la posición:[%d,%d]\n", mov->final[0], mov->final[1]);
-        }
-        if (!flag && matriz[mov->incial[0]][mov->incial[1]] != matriz[mov->final[0]][mov->final[1]])
-        {
-            flag = 1;
-            printf("Los botones no son del mismo color\n");
-        }
-        if (!flag && FUNCION_ENTRE_BOTONES)                              //Funcion entre botones
-        {
-            flag = 1;
-            printf("El corte no tiene una única variedad de botones\n");
-        }
+    }
+    if (!flag && mov->final[0] > dim && mov->final[1] > dim)
+    {
+        flag = 1;
+        printf("No existe la posición:[%d,%d]\n", mov->final[0], mov->final[1]);
+    }
+    if (!flag && matriz[mov->incial[0]][mov->incial[1]] != matriz[mov->final[0]][mov->final[1]])
+     {
+        flag = 1;
+        printf("Los botones no son del mismo color\n");
+     }
+     if (!flag && FUNCION_ENTRE_BOTONES)                              //Funcion entre botones
+     {
+        flag = 1;
+        printf("El corte no tiene una única variedad de botones\n");
+     }
 
-        //AGUSTIN ACA FALTARIA UN RETURN???? SUPONGO QUE DEL FLAG
+     return flag;
     }
 }
 
