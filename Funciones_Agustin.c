@@ -11,9 +11,10 @@ typedef struct
 
 void leer_movimiento(movimiento * mov, unsigned int dim, char ** matriz)
 {
- char estado, ultimo_caracter = '\0', flag = 1, caracter, caracter_final;
+ char estado, ultimo_caracter, flag = 1, caracter, caracter_final;
  do
  {
+      ultimo_caracter = '\0';
       printf("Ingrese el comando:\n");
       switch (estado = getchar()) {
           case '[': {
@@ -38,7 +39,8 @@ void leer_movimiento(movimiento * mov, unsigned int dim, char ** matriz)
               if (ultimo_caracter == '\n')
               {
                   printf("¿Está seguro que quiere salir (Y/N)?\n");
-                  if ((caracter = getchar()) == 'Y' && (caracter_final = getchar()) == '\n')
+                  caracter_final = '\0';
+		  if ((caracter = getchar()) == 'Y' && (caracter_final = getchar()) == '\n')
                   {
                       printf("¿Desea guardar la partida antes de salir (Y/N)?\n");
                       if ((caracter = getchar()) == 'Y' && (caracter_final = getchar()) == '\n')
@@ -101,9 +103,10 @@ int validar(movimiento * mov, unsigned int dim, char ** matriz)
 int menu()
 {
     int respuesta;
-    char ultimo_caracter = '\0';
+    char ultimo_caracter;
     do
     {
+	ultimo_caracter = '\0';
         printf("Escribir el numero de la opción deseada:\n");
         printf("1-Juego de dos jugadores\n");
         printf("2-Juego contra computadora\n");
