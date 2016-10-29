@@ -1,16 +1,16 @@
-<stdio.h>
+#include <stdio.h>
 
 typedef struct
 {
 	int inicial[2]
 	int final[2]
-} movimiento
+} movimiento;
 
-#define LIMPIAR_BUFFER while(getchar()!=EOF);
+#define LIMPIAR_BUFFER while(getchar()!=EOF)
 
 void leer_movimiento(movimiento * mov, unsigned int dim, char ** matriz)
 {
- char estado, ultimo_caracter='\0', flag=1, caracter, caracter_final;
+	char estado, ultimo_caracter='\0', flag=1, caracter, caracter_final;
  do
  {
   printf("Ingrese el comando:\n");
@@ -54,8 +54,8 @@ void leer_movimiento(movimiento * mov, unsigned int dim, char ** matriz)
   }
   If(ultimo_caracter!='\n')
   {
-   printf("Comando invalido\n")
-   LIMPIAR_BUFFER
+   printf("Comando invalido\n");
+   LIMPIAR_BUFFER;
   }
  }
  while(flag || validar(mov, dim, matriz))
@@ -63,8 +63,7 @@ void leer_movimiento(movimiento * mov, unsigned int dim, char ** matriz)
 
 int validar(movimiento * mov, unsigned int dim, char ** matriz)
 {
- int flag;
- flag=0;
+ int flag=0;
  if(mov->incial[1]!=mov->final[1] || mov->incial[0]!=mov->final[0] || mov->final[0]!=mov->incial[0]-mov->incial[1]+mov->final[1])  {
   flag=1;
   printf("Los botones no se encuentran en la misma horizontal, vertical o diagonal\n");
@@ -83,17 +82,19 @@ int validar(movimiento * mov, unsigned int dim, char ** matriz)
   flag=1;
   printf("Los botones no son del mismo color\n");
  }
- if((flag)! && FUNCION DE ENTRE BOTONES)                              \\Funcion entre botones
+ if(!flag && FUNCION DE ENTRE BOTONES)                              \\Funcion entre botones
  {
   flag=1;
   printf("El corte no tiene una única variedad de botones\n");
  }
+	 
+	 //AGUSTIN ACA FALTARIA UN RETURN???? SUPONGO QUE DEL FLAG
 }
 
 int menu()
 {
  int respuesta;
- char ultimo_caracter='\0'
+ char ultimo_caracter='\0';
  do
  {
   printf("Escribir el numero de la opción deseada:\n");
@@ -101,8 +102,8 @@ int menu()
   printf("2-Juego contra computadora\n");
   printf("3-Recuperar un juego grabado\n");
   printf("4-Terminar\n");
-  scanf("%d%c", &respuesta, &ultimo_caracter)
-  LIMPIAR_BUFFER
+  scanf("%d%c", &respuesta, &ultimo_caracter);
+  LIMPIAR_BUFFER;
  }
  while(ultimo_caracter=='\n' && respesta>0 && respuesta<5)
  return respuesta;
