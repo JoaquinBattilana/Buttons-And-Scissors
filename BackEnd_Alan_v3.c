@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include "random.h" //para los randInt
 
 #define INC_MAX 4
 #define VACIO 0
@@ -6,7 +7,6 @@
 #define MAX(a, b) a>b? a : b
 #define MIN(a, b) a<b? a : b
 
-//enum errores {ERROR=0, E_MEM_DIN, E_FORMATO,E_};
 typedef struct
 {
     char ** v;
@@ -20,6 +20,17 @@ typedef struct
 } punto_t;
 
 char dir_inc[INC_MAX][2] = {{0,1},{1,1},{1,0},{1,-1}}; //incremento direcciones DERECHA, D_ABAJO, ABAJO, I_ABAJO
+
+enum {NADA=0, SOBREESCRIBIR, AGREGAR};
+
+#define MIN_MOV 2
+
+typedef struct
+{
+    punto_t origen;
+    punto_t destino;
+    int cantBotones;
+} movimiento_t;
 
 int hayMovimientosValidos(matriz_t tablero) //chequea luego de cada turno para saber si hay un ganador
 {
@@ -54,19 +65,19 @@ int buscarBoton(matriz_t tablero, punto_t pos, char boton)
         punto_t direccion = {dir_inc[i][0], dir_inc[i][1]};
         punto_t punto1 = {0,0};
         punto_t punto2 = {tablero.n-1,tablero.n-1};
-        flag = esMovimientoValido(tablero, pos, punto1, punto2, direccion, boton);
+        flag = esMovimientoValido(tablero, pos, (movimiento_t) {punto1, punto2}, direccion, boton);
     }
 
     return flag;
 }
 
-int esMovimientoValido(matriz_t tablero, punto_t pos, punto_t p1, punto_t p2, punto_t dir, char boton)
+int esMovimientoValido(matriz_t tablero, punto_t pos, movimiento_t mov, punto_t dir, char boton)
 {
     int flag = 0;
     int i,j;
     char c;
     int minFil, maxFil, minCol, maxCol;
-    puntoMaxMin(p1, p2, &minFil, &maxFil, &minCol, &maxCol);
+    puntoMaxMin(mov.origen, mov.destino, &minFil, &maxFil, &minCol, &maxCol);
 
     for(i=pos.x, j=pos.y; i>=minFil && i<=maxFil && j>=minCol && j<=maxCol && !flag; i+=dir.x, j+=dir.y)
     {
@@ -79,9 +90,9 @@ int esMovimientoValido(matriz_t tablero, punto_t pos, punto_t p1, punto_t p2, pu
     return flag % 2; //para que en caso de el flag ser 2, retorne 0
 }
 
-punto_t calcularDireccion(punto_t origen, punto_t destino)
+punto_t calcularDireccion(movimiento_t mov)
 {
-    punto_t direccion = {destino.x - origen.x, destino.y - origen.y};
+    punto_t direccion = {mov.destino.x - mov.origen.x, mov.destino.y - mov.origen.y};
     if(direccion.x != 0)
         direccion.x = direccion.x / abs(direccion.x);
     if(direccion.y != 0)
@@ -90,12 +101,12 @@ punto_t calcularDireccion(punto_t origen, punto_t destino)
     return direccion;
 }
 
-int realizarCorte(matriz_t tablero, punto_t origen, punto_t destino, punto_t dir)
+int realizarCorte(matriz_t tablero, movimiento_t mov, punto_t dir)
 {
     int i,j;
     int botonesCortados = 0;
 
-    for(i=origen.x, j=origen.y; i != destino.x && j != destino.y; i+=dir.x, j+=dir.y)
+    for(i=mov.origen.x, j=mov.origen.y; i != mov.destino.x && j != mov.destino.y; i+=dir.x, j+=dir.y)
     {
         if(tablero.v[i][j] != VACIO)
         {
@@ -119,25 +130,13 @@ void puntoMaxMin(punto_t p1, punto_t p2, int * minFil, int * maxFil, int * minCo
     return;
 }
 
-
-
-/////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////// DE ACA PARA ABAJO ////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////
-
-
-enum {NADA=0, SOBREESCRIBIR, AGREGAR};
-#define MIN_MOV 2
-typedef struct
+int realizarCortePc(matriz_t tablero)
 {
-    punto_t origen;
-    punto_t destino;
-    int cantBotones;
-} movimiento_t;
+    movimiento_t mov = calcularMovPc(tablero);
+    punto_t direccion = calcularDireccion(mov);
+    mov.cantBotones = realizarCorte(tablero, mov, direccion);
+    return mov.cantBotones;
+}
 
 movimiento_t calcularMovPc(matriz_t tablero)
 {
@@ -181,7 +180,7 @@ movimiento_t calcularMovPc(matriz_t tablero)
 movimiento_t* calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, char boton, int (*cond)(int),int (*cmp)(movimiento_t*, size_t, int), size_t * nDim, movimiento_t* mov_vec)
 {
     int i,j;
-    int cantBtns;
+    int cantBtns = 0;
     int ret;
     size_t dim = *nDim;
     char c;
@@ -260,4 +259,3 @@ int compMinMov(movimiento_t* v, size_t n, int cantBtns)
 
     return valorRet;
 }
-
