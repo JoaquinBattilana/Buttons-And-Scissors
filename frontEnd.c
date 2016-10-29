@@ -38,7 +38,7 @@ void printError(int error){
  
 char ** matrizDsdArchivo(int n){
     error error=SIN_ERROR;
-    int random, i, eof, c;
+    int random, i, eof, c, validacion;
     char nombreArchivo[10];
     sprintf(nombreArchivo, "%dx%d", n,n );
     char pwd[10]="./";
@@ -50,19 +50,19 @@ char ** matrizDsdArchivo(int n){
             if (aux==NULL)
                 error=E_MEM_DIM;
             else{
-                fscanf(archivo, "%d\n", &c);
-                if (c>MAXMATRICESPORARCHIVO || c<1 || isdigit(c){
-                    return E_ARCHIVO_MATRICES;
+                validacion = fscanf(archivo, "%d\n", &c);
+                if ((c>MAXMATRICESPORARCHIVO || c<1 || !isdigit(c) && validacion == 2){
+                    error = E_ARCHIVO_MATRICES;
                 }
                 else{
                     random=randInt(1,c);
                     eof = buscarMatriz(archivo, random);
                     if (eof)
-                        return E_ARCHIVO_MATRICES;
+                        error = E_ARCHIVO_MATRICES;
                     else{
                         eof = escribirMatriz(archivo, aux, n);
                         if(eof)
-                            return E_ARCHIVO_MATRICES;
+                            error = E_ARCHIVO_MATRICES;
                         }
  
                     }
@@ -129,4 +129,3 @@ static void liberarMatrizCuadrada(char ** matriz, int n){
     return;
     }
     
-int verica_movimiento(char ** matriz, int dim, i
