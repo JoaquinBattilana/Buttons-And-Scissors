@@ -6,7 +6,7 @@ int main(void)
     menu();
 
     //blah blah blah
-    //codigo codigo cogido
+    //codigo codigo codido
     //paja
 
 
