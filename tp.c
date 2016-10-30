@@ -7,7 +7,7 @@
 #define limpiaBuffer while(getchar()!='\n');
 #define MAXMATRICESPORARCHIVO 5
 #define MAXNOMBREARCHIVO 11
-enum errores {SIN_ERROR=0, ERROR, E_MEM_DIN,E_ARCHIVO_MATRICES,E_ABRIR_ARCHIVO, E_NOMBRE_ARCHIVO, E_CREAR_ARCHIVO};
+enum errores {SIN_ERROR=0, ERROR, E_MEM_DIN,E_ARCHIVO_MATRICES,E_ABRIR_ARCHIVO, E_NOMBRE_ARCHIVO, E_CREAR_ARCHIVO, E_ARCHIVO_MAL};
 enum retornos {FALSO=0, VERDADERO};
 typedef enum errores error;
 typedef struct tipoJuego{
@@ -72,7 +72,7 @@ int cargarJuego(tipoJuego * juego){
 
 int leerArchivo(char * nombreArchivo, tipoJuego * juego){
     char c;
-    int error=SIN_ERROR;
+    int error=E_ARCHIVO_MAL, flag=0;
     FILE * archivo;
     archivo=fopen(nombreArchivo, "r");
     if (archivo!=NULL){
@@ -84,27 +84,22 @@ int leerArchivo(char * nombreArchivo, tipoJuego * juego){
                 c=fgetc(archivo);
                 if(c==1 || c==2){
                     juego->turno=c;
-                    for(i=0; i<juego->dim; i++){
-                        for(j=0; j<juego->dim; j++){
+                    for(i=0; i<juego->dim && !flag ; i++){
+                        for(j=0; j<juego->dim && !flag; j++){
                             c=fgetc(archivo)
                             if(isalpha(c))
                                 juego->tablero[i][j]=c;
                             else
-                                error=E_ABRIR_ARCHIVO;
+                                flag=1;
                         }
                     }
                 }
-                else
-                    error=E_ABRIR_ARCHIVO;
             }
-            else
-                error=E_ABRIR_ARCHIVO;
         }
         else 
             error=E_MEM_DIN;
-    }
-    else
-        error=E_ABRIR_ARCHIVO;
+    if (flag)
+        error=E_ARCHIVO_MAL;
     if(error)
         printf(error);
     return error;
@@ -180,7 +175,7 @@ static int existeArchivo(char * nombreArchivo){
 void printError(int error){
     char * s_errores[]={"No hay error\n", "Error\n", "Error en la memoria dinamica\n", "Error, el archivo de matrices esta mal hecho\n",
                         "Error, el archivo esta corrupto o no existe\n", "Error en el nombre de archivo \n",
-                        "Error al crear/sobrescribir el archivo \n"};
+                        "Error al crear/sobrescribir el archivo \n", "El archivo esta corrupto o mal escrito\n"};
     printf("%s\n", s_errores[error]);
     return;
 }
