@@ -6,6 +6,7 @@
 
 #define limpiaBuffer while(getchar()!='\n');
 #define MAXMATRICESPORARCHIVO 5
+#define MAXNOMBREARCHIVO 11
 enum errores {SIN_ERROR=0, ERROR, E_MEM_DIN,E_ARCHIVO_MATRICES,E_ABRIR_ARCHIVO, E_NOMBRE_ARCHIVO, E_CREAR_ARCHIVO};
 enum retornos {FALSO=0, VERDADERO};
 typedef enum errores error;
