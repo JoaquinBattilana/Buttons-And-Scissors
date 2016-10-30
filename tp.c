@@ -28,8 +28,10 @@ static int buscarMatriz(FILE*, int, int);
 static int escribirMatriz(FILE*, char **, int);
 static void liberarMatrizCuadrada(char **, int);
 static char ** creaMatrizCuadrada(int);
+int cargarJuego(tipoJuego *);
 char **matrizDsdArchivo(int);
 void printError(int);
+int leerArchivo(char *, tipoJuego * );
 
 int main(void){
     tipoJuego juego;
