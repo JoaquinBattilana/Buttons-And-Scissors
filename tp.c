@@ -1,13 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 #include "random.h"
 #include <ctype.h>
+#include <time.h>
 
 #define limpiaBuffer while(getchar()!='\n');
 #define MAXMATRICESPORARCHIVO 5
 #define MAXNOMBREARCHIVO 11
-enum errores {SIN_ERROR=0, ERROR, E_MEM_DIN,E_ARCHIVO_MATRICES,E_ABRIR_ARCHIVO, E_NOMBRE_ARCHIVO, E_CREAR_ARCHIVO, E_ARCHIVO_MAL};
+enum errores {SIN_ERROR=0, ERROR, E_MEM_DIN,E_ARCHIVO_MATRICES,E_ABRIR_ARCHIVO, E_NOMBRE_ARCHIVO,
+    E_CREAR_ARCHIVO, E_ARCHIVO_MAL,NO_SOBRESCRIBIR};
 enum retornos {FALSO=0, VERDADERO};
 typedef enum errores error;
 typedef struct tipoJuego{
@@ -34,31 +35,33 @@ void printError(int);
 int leerArchivo(char *, tipoJuego * );
 
 int main(void){
-    tipoJuego juego;
+    tipoJuego juego={NULL, 5, 1, 1};
     int i,j;
     char ** m;
     char n=5;
-    m = matrizDsdArchivo(n);
-    if (m!=NULL) {
-        for (i = 0; i < n; i++) {
-            for (j = 0; j < n; j++) {
-                printf("%c", m[i][j]);
+    srand(time(NULL));
+    juego.tablero = matrizDsdArchivo(juego.dim);
+    if (juego.tablero!=NULL) {
+        for (i = 0; i < juego.dim; i++) {
+            for (j = 0; j < juego.dim; j++) {
+                printf("%c", juego.tablero[i][j]);
             }
             putchar('\n');
         }
     }
+    /*guardarJuego(&juego);*/
+    cargarJuego(&juego);
     return SIN_ERROR;
 }
 
 
 int cargarJuego(tipoJuego * juego){
     char whitespace=0;
-    int error;
+    int error=SIN_ERROR;
     do{
-        error=SIN_ERROR;
         printf("Ingrese el nombre del archivo a cargar: ");
         char nombreArchivo[MAXNOMBREARCHIVO];
-        scanf("%10s%c", nombreArchivo, &c);
+        scanf("%10s%c", nombreArchivo, &whitespace);
         if(whitespace=='\n'){
             error = leerArchivo(nombreArchivo, juego);
         }
@@ -66,65 +69,69 @@ int cargarJuego(tipoJuego * juego){
             error=E_NOMBRE_ARCHIVO;
         if (error)
             printError(error);
-    } while(error)
+    } while(error);
     return error;
 }
 
 int leerArchivo(char * nombreArchivo, tipoJuego * juego){
     char c;
-    int error=E_ARCHIVO_MAL, flag=0;
+    int error=SIN_ERROR, flag=0,i,j;
     FILE * archivo;
     archivo=fopen(nombreArchivo, "r");
-    if (archivo!=NULL){
-        juego->tablero=creaMatrizCuadrada(juego->dim)
-        if(juego->tablero!=NULL){
+    if (archivo!=NULL) {
+        juego->tablero = creaMatrizCuadrada(juego->dim);
+        if (juego->tablero != NULL) {
             c = fgetc(archivo);
-            if(c==0 || c==1){
-                juego->tipoJuego=c;
-                c=fgetc(archivo);
-                if(c==1 || c==2){
-                    juego->turno=c;
-                    for(i=0; i<juego->dim && !flag ; i++){
-                        for(j=0; j<juego->dim && !flag; j++){
-                            c=fgetc(archivo)
-                            if(isalpha(c))
-                                juego->tablero[i][j]=c;
-                            else
-                                flag=1;
-                        }
+            if (c == 0 || c == 1) {
+                juego->modoJuego = c;
+                c = fgetc(archivo);
+                if (c == 1 || c == 2) {
+                    juego->turno = c;
+                    for (i = 0; i < juego->dim && !flag; i++) {
+                        for (j = 0; j < juego->dim && !flag; j++) {
+                            c = fgetc(archivo);
+                            if (isalpha(c))
+                                juego->tablero[i][j] = c;
+                            else{
+                                flag = 1;
+                                liberarMatrizCuadrada(juego->tablero, juego->dim);
+                                }
+                            }
                     }
                 }
             }
-        }
-        else 
-            error=E_MEM_DIN;
-    if (flag)
-        error=E_ARCHIVO_MAL;
-    if(error)
-        printf(error);
-    return error;
+        } else
+            error = E_MEM_DIN;
+        if (flag)
+            error = E_ARCHIVO_MAL;
+    }
+        return error;
 }
 
 int guardarJuego(tipoJuego * juego){
-    int error;
+    int error=SIN_ERROR;
     char whitespace=0;
     char nombreArchivo[MAXNOMBREARCHIVO];
     do{
-        error=SIN_ERROR;
-        limpiaBuffer
         printf("Nombre del archivo?: ");
-        scanf("%10s%c", nombreArchivo, &whitespace);  
-        if(whitespace=='\n')
-            if (existeArchivo(nombreArchivo)
-                if(sobrescribir())
+        scanf("%10s%c", nombreArchivo, &whitespace);
+        if(whitespace=='\n'){
+            if (existeArchivo(nombreArchivo)) {
+                if (sobrescribir())
                     error = escribirArchivo(nombreArchivo, juego);
+                else
+                    error=NO_SOBRESCRIBIR;
+            }
             else
-                error = escribirArchivo(nombreArchivo, juego);
-        else
+                error=escribirArchivo(nombreArchivo, juego);
+        }
+        else{
             error = E_NOMBRE_ARCHIVO;
-    if(error)
-        printError(error);
-    }while (error)
+            limpiaBuffer
+        }
+        if(error)
+            printError(error);
+    }while (error);
     return error;
 }
 
@@ -136,10 +143,10 @@ static int escribirArchivo(char * nombreArchivo, tipoJuego * juego){
     int error=SIN_ERROR;
     archivo = fopen(nombreArchivo, "wb");
     if (archivo!=NULL){
-        fputc(juego->tipoJuego, archivo);
+        fputc(juego->modoJuego, archivo);
         fputc(juego->turno, archivo);
-        for(i=0;i<n;i++){
-            for(j=0;j<n;j++)
+        for(i=0;i<juego->dim;i++){
+            for(j=0;j<juego->dim;j++)
                 fputc(juego->tablero[i][j], archivo);
         }
     }
@@ -147,19 +154,21 @@ static int escribirArchivo(char * nombreArchivo, tipoJuego * juego){
         error=E_CREAR_ARCHIVO;
     if (error)
         printError(error);
-    fclose(archivo);
+    else
+        fclose(archivo);
     return error;
 
 }
 
 static int sobrescribir(){
-    char respuesta;
+    int respuesta;
     do{
-    limpiaBuffer
-    printf("Hay un archivo con el mismo nombre, desea sobrescribirlo?(S/N) \n");
-    scanf("%c", &respuesta);
+        printf("Hay un archivo con el mismo nombre, desea sobrescribirlo?(y/n) \n");
+        respuesta=getchar();
+        if(getchar()!='\n')
+            limpiaBuffer
     }
-    while( (respuesta!='s' || (respuesta!='n')));
+    while( (respuesta!='y' && (respuesta!='n')));
     return 'n'-respuesta;
 }
 
@@ -175,21 +184,22 @@ static int existeArchivo(char * nombreArchivo){
 void printError(int error){
     char * s_errores[]={"No hay error\n", "Error\n", "Error en la memoria dinamica\n", "Error, el archivo de matrices esta mal hecho\n",
                         "Error, el archivo esta corrupto o no existe\n", "Error en el nombre de archivo \n",
-                        "Error al crear/sobrescribir el archivo \n", "El archivo esta corrupto o mal escrito\n"};
+                        "Error al crear/sobrescribir el archivo \n", "El archivo esta corrupto o mal escrito\n",
+                        "Elija otro nombre \n"};
     printf("%s\n", s_errores[error]);
     return;
 }
 
 
 char ** matrizDsdArchivo(int n){
-    error error=SIN_ERROR;
+    int error=SIN_ERROR;
     int i, c;
     char nombreArchivo[10], whitespace=0;
     sprintf(nombreArchivo, "%dx%d", n,n );
     char pwd[10]="./";
     char ** aux=NULL;
     FILE * archivo;
-    archivo = fopen(strcat(pwd, nombreArchivo), "r");
+    archivo = fopen("/home/joaquin/Escritorio/TP-master/5x5", "r");
     if (archivo!=NULL) {
         fscanf(archivo, "%d%c", &c, &whitespace);
         if ((c > MAXMATRICESPORARCHIVO || c < 1) && whitespace != '\n') {
@@ -217,7 +227,8 @@ char ** matrizDsdArchivo(int n){
         printError(error);
         aux=NULL;
     }
-    fclose(archivo);
+    else
+        fclose(archivo);
     return aux;
 }
 
@@ -288,6 +299,3 @@ static void liberarMatrizCuadrada(char ** matriz, int n){
     free(matriz);
     return;
 }
-//
-// Created by joaquin on 29/10/16.
-//
