@@ -21,13 +21,29 @@ int validar_dim(void){
     }
     while(ultimo_carracter != '\n' && dim < 5 && dim > 30)
     return dim;
-}   //ESTO ES FRONTEND PAJEROSSSSSSS xDDDD (igual supongo que fue para probarlo)
+}  
 
-int validar_volvermenu(void){ //?? Hmmm
-    
+int validar_volvermenu(void){
+    int flag = 1, rta;
+    char caracter, caracter_final;
+    printf("¿Desea volver al menú o salir (M\S)?\n");
+    do{
+       caracter_final = '\0';
+       if ((caracter = getchar()) == 'M' && (caracter_final = getchar()) == '\n'){
+           flag = 0;
+           rta = 1;
+       }
+       else if ((caracter = getchar()) == 'S' && (caracter_final = getchar()) == '\n'){
+                flag = rta = 0;
+            }
+            else{
+                printf("Formato invalido");
+            }
+    }
+    while(flag)
+}           
 
-int main(void)
-{
+int main(void){
     size_t opcion, dim, flag = 1, turno, flag_2 = 1;
     matriz_t tablero;
     opcion = menu();
@@ -68,7 +84,7 @@ int main(void)
                         FUNCION MOV MAQUINA
                     }
                 }
-                if((hayMovimientosValidos(tablero))!){ //AGUSTIN LA CONCHA DE TU HERMANA APRENDE A PONER EL NOT :@
+                if(!hayMovimientosValidos(tablero)){
                     printf("Gano el jugador %d\n", turno+1);
                     liberarMatrizCuadrada(tablero.v,tablero.n);
                     flag_2 = validar_volvermenu();
