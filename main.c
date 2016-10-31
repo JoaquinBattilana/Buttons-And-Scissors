@@ -21,9 +21,9 @@ int validar_dim(void){
     }
     while(ultimo_carracter != '\n' && dim < 5 && dim > 30)
     return dim;
-}
+}   //ESTO ES FRONTEND PAJEROSSSSSSS xDDDD (igual supongo que fue para probarlo)
 
-int validar_volvermenu(void){
+int validar_volvermenu(void){ //?? Hmmm
     
 
 int main(void)
@@ -38,7 +38,7 @@ int main(void)
                 case JVSJ:
                 case JVSCPU:{
                   tablero.n = validar_dim();
-                  tablero.v = matrizDsdArchivo(tableronn);
+                  tablero.v = matrizDsdArchivo(tablero);
                   jugadores[0].botones_cortados = jugadores[1].botones_cortados = 0;
                   jugadores[0].esPC = 0;
                   juagadores[1].esPC = (opcion == JVSCPU)? 1 : 0;
@@ -68,7 +68,7 @@ int main(void)
                         FUNCION MOV MAQUINA
                     }
                 }
-                if((hayMovimientosValidos(tablero))!){
+                if((hayMovimientosValidos(tablero))!){ //AGUSTIN LA CONCHA DE TU HERMANA APRENDE A PONER EL NOT :@
                     printf("Gano el jugador %d\n", turno+1);
                     liberarMatrizCuadrada(tablero.v,tablero.n);
                     flag_2 = validar_volvermenu();
