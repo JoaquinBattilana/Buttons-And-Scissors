@@ -113,7 +113,10 @@ int menu()
         printf("3-Recuperar un juego grabado\n");
         printf("4-Terminar\n");
         scanf("%d%c", &respuesta, &ultimo_caracter);
-        LIMPIAR_BUFFER();
+	if (ultimo_caracter != '\n')
+	{
+		LIMPIAR_BUFFER();
+	}        
     } while (ultimo_caracter == '\n' && respesta > 0 && respuesta < 5);
 
     return respuesta;
