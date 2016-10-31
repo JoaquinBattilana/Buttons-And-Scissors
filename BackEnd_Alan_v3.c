@@ -30,6 +30,21 @@ typedef struct
 
 char dir_inc[INC_MAX][2] = {{0,1},{1,1},{1,0},{1,-1}}; //incremento direcciones DERECHA, D_ABAJO, ABAJO, I_ABAJO
 
+int calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, char boton, int (*cond)(int), size_t dim, movimiento_t * mov_vec);
+void puntoMaxMin(punto_t p1, punto_t p2, int * minFil, int * maxFil, int * minCol, int * maxCol);
+int esMovimientoValido(matriz_t tablero, punto_t pos, movimiento_t mov, punto_t dir, char boton);
+movimiento_t * sobreescribir(movimiento_t * mov_vec, movimiento_t mov, int * dim);
+movimiento_t * agregar(movimiento_t * mov_vec, movimiento_t mov, int * dim);
+int realizarCorte(matriz_t * tablero, movimiento_t mov, punto_t dir);
+void calcularDireccion(movimiento_t mov, punto_t * direccion);
+int buscarBoton(matriz_t tablero, punto_t pos, char boton);
+void calcularMovPc(matriz_t tablero, movimiento_t * mov);
+int hayMovimientosValidos(matriz_t tablero);
+int realizarCortePc(matriz_t * tablero);
+void imprimirTablero(matriz_t tablero);
+int condMaxMov(int cantBotones);
+int condMinMov(int cantBotones);
+
 
 void imprimirTablero(matriz_t tablero)
 {
@@ -67,7 +82,7 @@ void imprimirTablero(matriz_t tablero)
 }
 
 
-int hayMovimientosValidos(matriz_t tablero) //chequea luego de cada turno para saber si hay un ganador
+int hayMovimientosValidos(matriz_t tablero) //invocar luego de cada turno para saber si hay un ganador
 {
     int flag = 0;
     char c;
