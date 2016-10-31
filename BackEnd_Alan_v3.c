@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "random.h" //para los randInt
 
 #define INC_MAX 4
@@ -29,7 +30,31 @@ typedef struct
 
 char dir_inc[INC_MAX][2] = {{0,1},{1,1},{1,0},{1,-1}}; //incremento direcciones DERECHA, D_ABAJO, ABAJO, I_ABAJO
 
+void imprimirTablero(matriz_t tablero)
+{
+    printf("\n\t");
+    int i, j;
 
+    for(i = 0; i<tablero.n; i++) //referencia numerica para las columnas
+        printf("%d\t", i);
+
+    j = 0, i = 0;
+
+    while(i<tablero.n && j<tablero.n)
+    {
+        int k = 0;
+        if(j==0)
+            printf("\n%d\t", i); //referencia numerica para las filas
+
+        printf("%c\t", tablero.v[i][j]);
+
+        if(++j == tablero.n)
+        {
+            i++;
+            j=0;
+        }
+    }
+}
 
 int hayMovimientosValidos(matriz_t tablero) //chequea luego de cada turno para saber si hay un ganador
 {
