@@ -30,31 +30,42 @@ typedef struct
 
 char dir_inc[INC_MAX][2] = {{0,1},{1,1},{1,0},{1,-1}}; //incremento direcciones DERECHA, D_ABAJO, ABAJO, I_ABAJO
 
+
 void imprimirTablero(matriz_t tablero)
 {
-    printf("\n\t");
+    printf("\n   ");
+
     int i, j;
 
-    for(i = 0; i<tablero.n; i++) //referencia numerica para las columnas
-        printf("%d\t", i);
+    for(i = 0; i < tablero.n; i++) //referencia numerica para las columnas
+        printf(" %d", i);
 
-    j = 0, i = 0;
+    i=0;
 
-    while(i<tablero.n && j<tablero.n)
+    printf("\n");
+
+    while(i < tablero.n)
     {
-        int k = 0;
-        if(j==0)
-            printf("\n%d\t", i); //referencia numerica para las filas
+        printf("\n");
 
-        printf("%c\t", tablero.v[i][j]);
+        for(j = 0; j < tablero.n; j++)
+        {
+            if(j==0)
+                printf("%d  ", i); //referencia numerica para las filas
 
-        if(++j == tablero.n)
+            printf(" %c", tablero.v[i][j]);
+        }
+
+        if(j == tablero.n)
         {
             i++;
-            j=0;
         }
     }
+
+    printf("\n\n");
+    return;
 }
+
 
 int hayMovimientosValidos(matriz_t tablero) //chequea luego de cada turno para saber si hay un ganador
 {
@@ -112,18 +123,20 @@ int esMovimientoValido(matriz_t tablero, punto_t pos, movimiento_t mov, punto_t 
             flag = 1;
     }
 
-    return flag % 2; //para que en caso de el flag ser 2, retorne 0
+    return flag % 2; //para que en caso de el flag sea igual a 2, retorne 0
 }
 
-punto_t calcularDireccion(movimiento_t mov)
+void calcularDireccion(movimiento_t mov, punto_t * direccion)
 {
-    punto_t direccion = {mov.destino.x - mov.origen.x, mov.destino.y - mov.origen.y};
-    if(direccion.x != 0)
-        direccion.x = direccion.x / abs(direccion.x);
-    if(direccion.y != 0)
-        direccion.y = direccion.y / abs(direccion.y);
+    direccion->x = mov.destino.x - mov.origen.x;
+    direccion->y = mov.destino.y - mov.origen.y;
 
-    return direccion;
+    if(direccion->x != 0)
+        direccion->x = direccion->x / abs(direccion->x);
+    if(direccion->y != 0)
+        direccion->y = direccion->y / abs(direccion->y);
+
+    return;
 }
 
 int realizarCorte(matriz_t * tablero, movimiento_t mov, punto_t dir)
@@ -157,13 +170,15 @@ void puntoMaxMin(punto_t p1, punto_t p2, int * minFil, int * maxFil, int * minCo
 
 int realizarCortePc(matriz_t * tablero)
 {
-    movimiento_t mov = calcularMovPc(*tablero);
-    punto_t direccion = calcularDireccion(mov);
+    movimiento_t mov;
+    calcularMovPc(*tablero, &mov);
+    punto_t direccion;
+    calcularDireccion(mov, &direccion);
     mov.cantBotones = realizarCorte(tablero, mov, direccion);
     return mov.cantBotones;
 }
 
-movimiento_t calcularMovPc(matriz_t tablero)
+void calcularMovPc(matriz_t tablero, movimiento_t * mov)
 {
     size_t dim = 0;
     movimiento_t * mov_vec = NULL;
@@ -196,9 +211,15 @@ movimiento_t calcularMovPc(matriz_t tablero)
         }
     }
 
-    int indice = randInt(0, dim);
+    int indice = randInt(0, dim-1);
 
-    mov_vec[indice];
+    mov->origen.x = mov_vec[indice].origen.x;
+    mov->origen.y = mov_vec[indice].origen.y;
+    mov->destino.x = mov_vec[indice].destino.x;
+    mov->destino.y = mov_vec[indice].destino.y;
+    mov->cantBotones = mov_vec[indice].cantBotones;
+
+    return;
 }
 
 
@@ -256,7 +277,13 @@ movimiento_t * sobreescribir(movimiento_t * mov_vec, movimiento_t mov, int * dim
 {
     *dim = 1;
     mov_vec = realloc(mov_vec, *dim * sizeof(*mov_vec)); //OPTIMISTA
-    mov_vec[0] = {mov.origen, mov.destino, mov.cantBotones};
+
+    mov_vec[0].origen.x = mov.origen.x;
+    mov_vec[0].origen.y = mov.origen.y;
+    mov_vec[0].destino.x = mov.destino.x;
+    mov_vec[0].destino.y = mov.destino.y;
+    mov_vec[0].cantBotones = mov.cantBotones;
+
     return  mov_vec;
 }
 
@@ -264,6 +291,12 @@ movimiento_t * agregar(movimiento_t * mov_vec, movimiento_t mov, int * dim)
 {
     (*dim)++;
     mov_vec = realloc(mov_vec, *dim * sizeof(*mov_vec)); //OPTIMISTA
-    mov_vec[*dim - 1] = {mov.origen, mov.destino, mov.cantBotones};
+
+    mov_vec[*dim - 1].origen.x = mov.origen.x;
+    mov_vec[*dim - 1].origen.y = mov.origen.y;
+    mov_vec[*dim - 1].destino.x = mov.destino.x;
+    mov_vec[*dim - 1].destino.y = mov.destino.y;
+    mov_vec[*dim - 1].cantBotones = mov.cantBotones;
+
     return mov_vec;
 }
