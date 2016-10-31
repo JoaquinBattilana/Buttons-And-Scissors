@@ -39,6 +39,10 @@ int validar_volvermenu(void){
             else{
                 printf("Formato invalido");
             }
+        if (ultimo_caracter != '\n')
+	    {
+		LIMPIAR_BUFFER();
+	    }  
     }
     while(flag)
 }           
