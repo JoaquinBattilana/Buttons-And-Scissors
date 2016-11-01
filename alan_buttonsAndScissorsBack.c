@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "random.h" //para los randInt
+#include "random.h"
 
 #define INC_MAX 4
 #define VACIO 0
@@ -31,10 +31,10 @@ typedef struct
 char dir_inc[INC_MAX][2] = {{0,1},{1,1},{1,0},{1,-1}}; //incremento direcciones DERECHA, D_ABAJO, ABAJO, I_ABAJO
 
 int calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, char boton, int (*cond)(int), size_t dim, movimiento_t * mov_vec);
-void puntoMaxMin(punto_t p1, punto_t p2, int * minFil, int * maxFil, int * minCol, int * maxCol);
+void limitesSubMatriz(punto_t p1, punto_t p2, int * minFil, int * maxFil, int * minCol, int * maxCol);
 int esMovimientoValido(matriz_t tablero, punto_t pos, movimiento_t mov, punto_t dir, char boton);
-movimiento_t * sobreescribir(movimiento_t * mov_vec, movimiento_t mov, int * dim);
-movimiento_t * agregar(movimiento_t * mov_vec, movimiento_t mov, int * dim);
+movimiento_t * sobreescribir(movimiento_t * mov_vec, movimiento_t mov, size_t * dim);
+movimiento_t * agregar(movimiento_t * mov_vec, movimiento_t mov, size_t * dim);
 int realizarCorte(matriz_t * tablero, movimiento_t mov, punto_t dir);
 void calcularDireccion(movimiento_t mov, punto_t * direccion);
 int buscarBoton(matriz_t tablero, punto_t pos, char boton);
@@ -44,7 +44,6 @@ int realizarCortePc(matriz_t * tablero);
 void imprimirTablero(matriz_t tablero);
 int condMaxMov(int cantBotones);
 int condMinMov(int cantBotones);
-
 
 void imprimirTablero(matriz_t tablero)
 {
@@ -113,9 +112,9 @@ int buscarBoton(matriz_t tablero, punto_t pos, char boton)
     for(i=0; i<INC_MAX && !flag; i++)
     {
         punto_t direccion = {dir_inc[i][0], dir_inc[i][1]};
-        punto_t punto1 = {0,0};
-        punto_t punto2 = {tablero.n-1,tablero.n-1};
-        movimiento_t mov = {punto1, punto2};
+        punto_t limiteInferior = {0,0};
+        punto_t limiteSuperior = {tablero.n-1,tablero.n-1};
+        movimiento_t mov = {limiteInferior, limiteSuperior};
         flag = esMovimientoValido(tablero, pos, mov, direccion, boton);
     }
 
@@ -124,11 +123,10 @@ int buscarBoton(matriz_t tablero, punto_t pos, char boton)
 
 int esMovimientoValido(matriz_t tablero, punto_t pos, movimiento_t mov, punto_t dir, char boton)
 {
-    int flag = 0;
-    int i,j;
+    int i,j, minFil, maxFil, minCol, maxCol, flag = 0;
     char c;
-    int minFil, maxFil, minCol, maxCol;
-    puntoMaxMin(mov.origen, mov.destino, &minFil, &maxFil, &minCol, &maxCol);
+
+    limitesSubMatriz(mov.origen, mov.destino, &minFil, &maxFil, &minCol, &maxCol);
 
     for(i=pos.x, j=pos.y; i>=minFil && i<=maxFil && j>=minCol && j<=maxCol && !flag; i+=dir.x, j+=dir.y)
     {
@@ -156,8 +154,7 @@ void calcularDireccion(movimiento_t mov, punto_t * direccion)
 
 int realizarCorte(matriz_t * tablero, movimiento_t mov, punto_t dir)
 {
-    int i,j;
-    int botonesCortados = 0;
+    int i, j, botonesCortados = 0;
 
     for(i=mov.origen.x, j=mov.origen.y; i != mov.destino.x && j != mov.destino.y; i+=dir.x, j+=dir.y)
     {
@@ -174,12 +171,13 @@ int realizarCorte(matriz_t * tablero, movimiento_t mov, punto_t dir)
     return botonesCortados;
 }
 
-void puntoMaxMin(punto_t p1, punto_t p2, int * minFil, int * maxFil, int * minCol, int * maxCol)
+void limitesSubMatriz(punto_t p1, punto_t p2, int * minFil, int * maxFil, int * minCol, int * maxCol)
 {
     *minFil = MIN(p1.x, p2.x);
-    *maxFil = MAX(p2.x, p2.x);
+    *maxFil = MAX(p1.x, p2.x);
     *minCol = MIN(p1.y, p2.y);
-    *maxCol = MAX(p2.y, p2.y);
+    *maxCol = MAX(p1.y, p2.y);
+
     return;
 }
 
@@ -190,6 +188,7 @@ int realizarCortePc(matriz_t * tablero)
     punto_t direccion;
     calcularDireccion(mov, &direccion);
     mov.cantBotones = realizarCorte(tablero, mov, direccion);
+
     return mov.cantBotones;
 }
 
@@ -228,11 +227,7 @@ void calcularMovPc(matriz_t tablero, movimiento_t * mov)
 
     int indice = randInt(0, dim-1);
 
-    mov->origen.x = mov_vec[indice].origen.x;
-    mov->origen.y = mov_vec[indice].origen.y;
-    mov->destino.x = mov_vec[indice].destino.x;
-    mov->destino.y = mov_vec[indice].destino.y;
-    mov->cantBotones = mov_vec[indice].cantBotones;
+    *mov = mov_vec[indice];
 
     return;
 }
@@ -240,8 +235,7 @@ void calcularMovPc(matriz_t tablero, movimiento_t * mov)
 
 int calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, char boton, int (*cond)(int), size_t dim, movimiento_t * mov_vec)
 {
-    int i,j;
-    int cantBtns = 0;
+    int i,j, cantBtns = 0;
     char c;
 
     for(i=pos.x, j=pos.y; ((c = tablero.v[i][j]) == boton || c == VACIO) && (*cond)(cantBtns); i+=dir.x, j+=dir.y)
@@ -254,18 +248,18 @@ int calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, char boton, i
                     if(dim == 0)
                     {
                         movimiento_t mov = {pos, {i,j}, cantBtns};
-                        sobreescribir(mov_vec, mov, dim);
+                        sobreescribir(mov_vec, mov, &dim);
                     }
 
                     else if(mov_vec[0].cantBotones < cantBtns)
                     {
                         movimiento_t mov = {pos, {i,j}, cantBtns};
-                        sobreescribir(mov_vec, mov, dim);
+                        sobreescribir(mov_vec, mov, &dim);
                     }
                     else if(mov_vec[0].cantBotones == cantBtns)
                     {
                         movimiento_t mov = {pos, {i,j}, cantBtns};
-                        agregar(mov_vec, mov, dim);
+                        agregar(mov_vec, mov, &dim);
                     }
                 }
             }
@@ -278,40 +272,32 @@ int condMinMov(int cantBotones)
 {
     int continuarCiclo = 0;
     if(cantBotones < MIN_MOV)
-        continuarCiclo = 1;
+        continuarCiclo = 1; //continua solo si el movimiento no alcanzo la cantidad de botones del mov minimo
 
     return continuarCiclo;
 }
 
 int condMaxMov(int cantBotones)
 {
-    return 1;
+    return 1; //para que no afecte la condicion del ciclo for que lo invoca
 }
 
-movimiento_t * sobreescribir(movimiento_t * mov_vec, movimiento_t mov, int * dim)
+movimiento_t * sobreescribir(movimiento_t * mov_vec, movimiento_t mov, size_t * dim)
 {
     *dim = 1;
     mov_vec = realloc(mov_vec, *dim * sizeof(*mov_vec)); //OPTIMISTA
 
-    mov_vec[0].origen.x = mov.origen.x;
-    mov_vec[0].origen.y = mov.origen.y;
-    mov_vec[0].destino.x = mov.destino.x;
-    mov_vec[0].destino.y = mov.destino.y;
-    mov_vec[0].cantBotones = mov.cantBotones;
+    mov_vec[0] = mov;
 
     return  mov_vec;
 }
 
-movimiento_t * agregar(movimiento_t * mov_vec, movimiento_t mov, int * dim)
+movimiento_t * agregar(movimiento_t * mov_vec, movimiento_t mov, size_t * dim)
 {
     (*dim)++;
     mov_vec = realloc(mov_vec, *dim * sizeof(*mov_vec)); //OPTIMISTA
 
-    mov_vec[*dim - 1].origen.x = mov.origen.x;
-    mov_vec[*dim - 1].origen.y = mov.origen.y;
-    mov_vec[*dim - 1].destino.x = mov.destino.x;
-    mov_vec[*dim - 1].destino.y = mov.destino.y;
-    mov_vec[*dim - 1].cantBotones = mov.cantBotones;
+    mov_vec[*dim - 1] = mov;
 
     return mov_vec;
 }
