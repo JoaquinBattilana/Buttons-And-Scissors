@@ -6,34 +6,64 @@
 
 typedef struct
 {
-    int inicial[2];
-    int final[2];
-} movimiento;
+    char ** v;
+    int n;
+} matriz_t;
 
-int validar(movimiento * mov, unsigned int dim, char ** matriz)
+typedef struct
+{
+    int x;
+    int y;
+} punto_t;
+
+typedef struct
+{
+    punto_t origen;
+    punto_t destino;
+    int cantBotones;
+} movimiento_t;
+
+int calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, char boton, int (*cond)(int), size_t dim, movimiento_t * mov_vec);
+void limitesSubMatriz(punto_t p1, punto_t p2, int * minFil, int * maxFil, int * minCol, int * maxCol);
+int esMovimientoValido(matriz_t tablero, punto_t pos, movimiento_t mov, punto_t dir, char boton);
+movimiento_t * sobreescribir(movimiento_t * mov_vec, movimiento_t mov, size_t * dim);
+movimiento_t * agregar(movimiento_t * mov_vec, movimiento_t mov, size_t * dim);
+int realizarCorte(matriz_t * tablero, movimiento_t mov, punto_t dir);
+void calcularDireccion(movimiento_t mov, punto_t * direccion);
+int buscarBoton(matriz_t tablero, punto_t pos, char boton);
+void calcularMovPc(matriz_t tablero, movimiento_t * mov);
+int hayMovimientosValidos(matriz_t tablero);
+int realizarCortePc(matriz_t * tablero);
+void imprimirTablero(matriz_t tablero);
+int condMaxMov(int cantBotones);
+int condMinMov(int cantBotones);
+
+int validar(movimiento_t * mov, matriz_t tablero)
 {
     int flag = 0;
-    if (mov->inicial[1] != mov->final[1] || mov->inicial[0] != mov->final[0] || mov->final[0] != mov->inicial[0] - mov->inicial[1] + mov->final[1])
+    if (mov->origen.y != mov->destino.y || mov->origen.x != mov->destino.x || mov->destino.x != mov->origen.x - mov->origen.y + mov->destino.y)
     {
         flag = 1;
         printf("Los botones no se encuentran en la misma horizontal, vertical o diagonal\n");
     }
-    if (!flag && mov->inicial[0] > dim && mov->inicial[1] > dim)
+    if (!flag && mov->origen.x > dim && mov->origen.y > dim)
     {
         flag = 1;
         printf("No existe la posición:[%d,%d]\n", mov->inicial[0], mov->inicial[1]);
     }
-    if (!flag && mov->final[0] > dim && mov->final[1] > dim)
+    if (!flag && mov->destino.x > dim && mov->destino.y > dim)
     {
         flag = 1;
         printf("No existe la posición:[%d,%d]\n", mov->final[0], mov->final[1]);
     }
-    if (!flag && matriz[mov->inicial[0]][mov->inicial[1]] != matriz[mov->final[0]][mov->final[1]])
+    if (!flag && tablero.v[mov->origen.x][mov->origen.y] != tablero.v[mov->destino.x][mov->destino.y])
     {
         flag = 1;
         printf("Los botones no son del mismo color\n");
     }
-    if (!flag && 1)                              //Funcion entre botones
+    punto_t direccion;
+    calcularDireccion(*mov, &direccion);
+    if (!flag && esMovimientoValido(tablero, mov->origen, *mov, direccion))
     {
         flag = 1;
         printf("El corte no tiene una única variedad de botones\n");
@@ -42,23 +72,27 @@ int validar(movimiento * mov, unsigned int dim, char ** matriz)
     return flag;
 }
 
-void leer_movimiento(movimiento * mov, size_t dim, char ** matriz)
+void leer_movimiento(movimiento_t * mov, matriz_t tablero)
 {
     char estado, ultimo_caracter, flag = 1, caracter, caracter_final;
     do
     {
         ultimo_caracter = '\0';
         printf("Ingrese el comando:\n");
-        switch (estado = getchar()) {
-            case '[': {
-                scanf("%d,%d] [%d,%d]%c", mov->inicial[0], mov->inicial[1], mov->final[0], mov->final[1], &ultimo_caracter);
+        switch (estado = getchar())
+        {
+            case '[':
+            {
+                scanf("%d,%d] [%d,%d]%c", mov->origen.x, mov->origen.y, mov->destino.x, mov->destino.y, &ultimo_caracter);
                 if (ultimo_caracter == '\n')
                     flag = 0;
                 break;
             }
-            case 's': {
+            case 's':
+            {
                 scanf("ave%c", ultimo_caracter);
-                if (ultimo_caracter == ' ') {
+                if (ultimo_caracter == ' ')
+                {
                     //Guardar
                     printf("La partida se guardó exitosamente\n");
                 }
@@ -94,7 +128,7 @@ void leer_movimiento(movimiento * mov, size_t dim, char ** matriz)
                     LIMPIAR_BUFFER();
                 }
         }
-    } while (flag || validar(mov, dim, matriz));
+    } while (flag || validar(mov, tablero));
 }
 
 int menu()
@@ -119,7 +153,8 @@ int menu()
     return respuesta;
 }
 
-int main(void){
+
+int main(void){ //coregir struct
     int i = menu();
     char ** matriz;
     movimiento mov;
