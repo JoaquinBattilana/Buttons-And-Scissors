@@ -136,7 +136,7 @@ int menu()
         printf("2-Juego contra computadora\n");
         printf("3-Recuperar un juego grabado\n");
         printf("4-Terminar\n");
-        scanf("%d%c", &respuesta, &ultimo_caracter);
+        scanf("%c%c", &respuesta, &ultimo_caracter);
         if (ultimo_caracter != '\n')
         {
             LIMPIAR_BUFFER;
