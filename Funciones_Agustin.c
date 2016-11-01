@@ -126,7 +126,7 @@ void leer_movimiento(movimiento_t * mov, matriz_t tablero)
 
 int menu()
 {
-    int respuesta;
+    char respuesta;
     char ultimo_caracter;
     do
     {
@@ -141,7 +141,7 @@ int menu()
         {
             LIMPIAR_BUFFER;
         }
-    } while (ultimo_caracter != '\n' && respuesta < 0 && respuesta > 5);
+    } while (ultimo_caracter != '\n' || respuesta < '1' || respuesta > '4');
 
     return respuesta;
 }
