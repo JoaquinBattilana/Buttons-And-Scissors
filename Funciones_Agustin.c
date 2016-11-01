@@ -74,61 +74,17 @@ int validar(movimiento_t * mov, matriz_t tablero)
 
 void leer_movimiento(movimiento_t * mov, matriz_t tablero)
 {
-    char estado, ultimo_caracter, flag = 1, caracter, caracter_final;
+    char estado, ultimo_caracter, flag = 1, caracter, caracter_final, vector[16];
+    printf("Ingrese el comando:\n");
     do
     {
-        ultimo_caracter = '\0';
-        printf("Ingrese el comando:\n");
-        switch (estado = getchar())
-        {
-            case '[':
-            {
-                scanf("%d,%d] [%d,%d]%c", mov->origen.x, mov->origen.y, mov->destino.x, mov->destino.y, &ultimo_caracter);
-                if (ultimo_caracter == '\n')
-                    flag = 0;
-                break;
-            }
-            case 's':
-            {
-                scanf("ave%c", ultimo_caracter);
-                if (ultimo_caracter == ' ')
-                {
-                    //Guardar
-                    printf("La partida se guardó exitosamente\n");
-                }
-                break;
-            }
-            case 'q':
-            {
-                scanf("uit%c, ultimo_caracter");
-                if (ultimo_caracter == '\n')
-                {
-                    printf("¿Está seguro que quiere salir (Y/N)?\n");
-                    caracter_final = '\0';
-                    if ((caracter = getchar()) == 'Y' && (caracter_final = getchar()) == '\n')
-                    {
-                        printf("¿Desea guardar la partida antes de salir (Y/N)?\n");
-                        if ((caracter = getchar()) == 'Y' && (caracter_final = getchar()) == '\n')
-                        {
-                            printf("Ingrese el nombre del archivo:\n");
-                            //Guardar
-                            //Sale
-                        }else if (caracter == 'N' && caracter_final == '\n')
-                            ;
-                        else
-                            ultimo_caracter = '\0';
-                    }
-                    else if (caracter != 'N' || caracter_final != '\n')
-                        ultimo_caracter = '\0';
-                }
-            }
-                if(ultimo_caracter != '\n')
-                {
-                    printf("Comando invalido\n");
-                    LIMPIAR_BUFFER();
-                }
-        }
-    } while (flag || validar(mov, tablero));
+        ultimo_caracter = 0;
+        fgets(vector, 16, stdin);
+        sscanf("%d,%d] [%d,%d]%c", mov->origen.x, mov->origen.y, mov->destino.x, mov->destino.y, &ultimo_caracter);
+        if(ultimo_caracter == '\n')
+            flag = validar(mov, tablero);
+       
+    }while (flag);
 }
 
 int menu()
