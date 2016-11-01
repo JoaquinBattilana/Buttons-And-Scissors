@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define LIMPIAR_BUFFER() while(getchar()!=EOF)
+#define LIMPIAR_BUFFER while(getchar()!=EOF)
 
 typedef struct
 {
@@ -72,19 +72,56 @@ int validar(movimiento_t * mov, matriz_t tablero)
     return flag;
 }
 
+void(char * s)
+{
+    for(i=0; c=getchar() !=
+
 void leer_movimiento(movimiento_t * mov, matriz_t tablero)
 {
-    char estado, ultimo_caracter, flag = 1, caracter, caracter_final, vector[16];
+    char estado, ultimo_caracter, flag_error = 0, vector[16], flag_salida = 1, *nombre_archivo;
     printf("Ingrese el comando:\n");
     do
     {
+        flag = 1
         ultimo_caracter = 0;
         fgets(vector, 16, stdin);
-        sscanf("%d,%d] [%d,%d]%c", mov->origen.x, mov->origen.y, mov->destino.x, mov->destino.y, &ultimo_caracter);
+        sscanf("[%d,%d] [%d,%d]%c", mov->origen.x, mov->origen.y, mov->destino.x, mov->destino.y, &ultimo_caracter);
         if(ultimo_caracter == '\n')
-            flag = validar(mov, tablero);
-       
-    }while (flag);
+            flag_salida= validar(mov, tablero);
+        else if(!strcmp(vector, "savefile "))
+             {
+                \\guardar nombre dinamicamente
+             }
+        else if(!strcmp(vector, "quit"))
+             {
+                  printf("¿Está seguro que quiere salir (Y/N)?\n");
+                  fgets(vector, 16, stdin);
+                  if(vector[0]=='Y' && vector[1]=='\n')
+                  {
+                     printf("¿Desea guardar la partida antes de salir (Y/N)?\n");
+                     fgets(vector, 16, stdin);
+                     if(vector[0]=='Y' && vector[1]=='\n')
+                     {
+                        printf("Ingrese el nombre del archivo:\n");
+                        \\guarda nombre dinamicamente
+                        flag_salida = 0;
+                     }
+                     else if(vector[0]=='N' && vector[1]=='\n')
+                             flag_salida = 0;
+                  }
+                  else if(vector[0]=='N' && vector[1]=='\n')
+                             flag = 1;
+             }
+             else
+             {
+                 flag_error = 1;
+                 LIMPIAR_BUFFER;
+             }
+                     
+        }
+        if(flag_error)
+            printf("comando invalido\n");
+    }while (flag_salida);
 }
 
 int menu()
@@ -102,7 +139,7 @@ int menu()
         scanf("%d%c", &respuesta, &ultimo_caracter);
         if (ultimo_caracter != '\n')
         {
-            LIMPIAR_BUFFER();
+            LIMPIAR_BUFFER;
         }
     } while (ultimo_caracter != '\n' && respuesta < 0 && respuesta > 5);
 
