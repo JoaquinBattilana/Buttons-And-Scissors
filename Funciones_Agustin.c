@@ -129,7 +129,9 @@ void leer_movimiento(movimiento_t * mov, matriz_t tablero)
                               flag_error = 1;
                   }
                   else if(vector[0]=='N' && vector[1]=='\n')
-                             exit(2);
+                             exit(1);
+                       else
+                           flag_error =1;
              }
              else
              {
