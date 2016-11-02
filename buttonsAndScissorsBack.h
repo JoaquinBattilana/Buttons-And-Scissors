@@ -1,21 +1,42 @@
+#ifndef _BUTTONS_AND_SCISSORS_BACK
 
-int calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, char boton, int (*cond)(int), size_t dim, movimiento_t * mov_vec);
+#define _BUTTONS_AND_SCISSORS_BACK
 
-void limitesSubMatriz(punto_t p1, punto_t p2, int * minFil, int * maxFil, int * minCol, int * maxCol);
+#define INC_MAX 4
+#define VACIO 0
+#define MIN_MOV 2
 
-int esMovimientoValido(matriz_t tablero, punto_t pos, movimiento_t mov, punto_t dir, char boton);
+#define MAX(a, b) (a)>(b)? (a) : (b)
+#define MIN(a, b) (a)<(b)? (a) : (b)
 
-movimiento_t * sobreescribir(movimiento_t * mov_vec, movimiento_t mov, size_t * dim);
+typedef struct
+{
+    char ** v;
+    int n;
+} matriz_t;
 
-movimiento_t * agregar(movimiento_t * mov_vec, movimiento_t mov, size_t * dim);
+typedef struct
+{
+    int x;
+    int y;
+} punto_t;
+
+typedef struct
+{
+    punto_t origen;
+    punto_t destino;
+    int cantBotones;
+} movimiento_t;
+
+int esMovimientoValido(matriz_t tablero, movimiento_t puntos, punto_t dir, char boton, int (*cmp)(movimiento_t, char, char));
+
+int condMovimientoTurno(movimiento_t puntos, char boton, char botonLeido);
+
+int condMovimientoJugador(movimiento_t puntos, char boton, char botonLeido);
 
 int realizarCorte(matriz_t * tablero, movimiento_t mov, punto_t dir);
 
 void calcularDireccion(movimiento_t mov, punto_t * direccion);
-
-int buscarBoton(matriz_t tablero, punto_t pos, char boton);
-
-void calcularMovPc(matriz_t tablero, movimiento_t * mov);
 
 int hayMovimientosValidos(matriz_t tablero);
 
@@ -23,6 +44,8 @@ int realizarCortePc(matriz_t * tablero);
 
 void imprimirTablero(matriz_t tablero); //ES FRONT END, CORREGIR JE
 
-int condMaxMov(int cantBotones);
+int condMaxMov(int cantBotones, char boton, char botonPosActual);
 
-int condMinMov(int cantBotones);
+int condMinMov(int cantBotones, char boton, char botonPosActual);
+
+#endif
