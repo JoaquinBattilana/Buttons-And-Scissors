@@ -1,46 +1,10 @@
 #include "buttonsAndScissorsBack.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #define LIMPIAR_BUFFER while(getchar()!=EOF)
 #define BLOQUE 10
-/*
-typedef struct
-{
-    char ** v;
-    int n;
-} matriz_t;
-
-typedef struct
-{
-    int x;
-    int y;
-} punto_t;
-
-typedef struct
-{
-    punto_t origen;
-    punto_t destino;
-    int cantBotones;
-} movimiento_t;
-*/ //ESTO ESTA SOLO COMO REFERENCIA PARA AGUSTIN
-int validar(movimiento_t * mov, matriz_t tablero)
-{
-    int flag = 0;
-    if (mov->origen.y != mov->destino.y || mov->origen.x != mov->destino.x || mov->destino.x != mov->origen.x - mov->origen.y + mov->destino.y)
-        flag = 4;
-    if (!flag && mov->origen.x > dim && mov->origen.y > dim)
-        flag = 5;
-    if (!flag && mov->destino.x > dim && mov->destino.y > dim)
-        flag = 6;
-    if (!flag && tablero.v[mov->origen.x][mov->origen.y] != tablero.v[mov->destino.x][mov->destino.y])
-        flag = 7;
-    punto_t direccion;
-    calcularDireccion(*mov, &direccion);
-    if (!flag && esMovimientoValido(tablero, mov->origen, *mov, direccion))
-        flag = 8;
-    return flag;
-}
 
 char * vec_error[] = {
     "",
@@ -52,18 +16,52 @@ char * vec_error[] = {
     "",
     "Los botones no son del mismo color\n",
     "El corte no tiene una única variedad de botones\n"
+};
+
+typedef struct
+{
+    char ** v;
+    int n;
+} matriz_t;
+typedef struct
+{
+    int x;
+    int y;
+} punto_t;
+typedef struct
+{
+    punto_t origen;
+    punto_t destino;
+    int cantBotones;
+} movimiento_t;
+
+int validar(movimiento_t * mov, matriz_t tablero)
+{
+    int flag = 0;
+    if (mov->origen.y != mov->destino.y || mov->origen.x != mov->destino.x || mov->destino.x != mov->origen.x - mov->origen.y + mov->destino.y)
+        flag = 4;
+    if (!flag && mov->origen.x > tablero.n && mov->origen.y > tablero.n)
+        flag = 5;
+    if (!flag && mov->destino.x > tablero.n && mov->destino.y > tablero.n)
+        flag = 6;
+    if (!flag && tablero.v[mov->origen.x][mov->origen.y] != tablero.v[mov->destino.x][mov->destino.y])
+        flag = 7;
+    punto_t direccion;
+    calcularDireccion(*mov, &direccion);
+    if (!flag && esMovimientoValido(tablero, mov->origen, *mov, direccion))
+        flag = 8;
+    return flag;
 }
-    
-    
+
+   
 
 void leer_movimiento(movimiento_t * mov, matriz_t tablero)
 {
     char ultimo_caracter, flag_error = 0, vector[267], nombre_archivo[256];
     int i, k;
-    printf("Ingrese el comando:\n");5
+    printf("Ingrese el comando:\n");
     do
     {
-        flag = 1
         ultimo_caracter = 0;
         fgets(vector, 267, stdin);
         sscanf("[%d,%d] [%d,%d]%c", mov->origen.x, mov->origen.y, mov->destino.x, mov->destino.y, &ultimo_caracter);
@@ -101,10 +99,12 @@ void leer_movimiento(movimiento_t * mov, matriz_t tablero)
                             nombre_archivo[k] = vector[k];
                         nombre_archivo[++k] = '\0';
                         if(i == 256)
+                        {
                             flag_error = 3;
                             LIMPIAR_BUFFER;
+                        }
                         else if(k == 1)
-                            flag_error = 2;
+                               flag_error = 2;
                              else
                                flag_error = guardarJuego(nombre_archivo, tablero);
                      }
@@ -123,8 +123,6 @@ void leer_movimiento(movimiento_t * mov, matriz_t tablero)
                  flag_error = 1;
                  LIMPIAR_BUFFER;
              }
-                     
-        }
         if(flag_error == 5)
             printf("No existe la posición:[%d,%d]\n", mov->origen.x, mov->origen.y);
         else if(flag_error == 6)
@@ -158,13 +156,6 @@ int menu()
 
 
 int main(void){ //coregir struct
-    int i = menu();
-    char ** matriz;
-    movimiento mov;
-    matriz = malloc(5*sizeof(*matriz));
-    for(i=0; i<5; i++){
-        *(matriz+i) = malloc(5*sizeof(**matriz));
-    }
-    leer_movimiento(&mov, 5, matriz);
-    printf("%d", i);
+    
 }
+
