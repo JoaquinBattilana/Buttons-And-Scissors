@@ -96,9 +96,12 @@ int esMovimientoValido(matriz_t tablero, movimiento_t puntos, punto_t dir, char 
 
     for(i=puntos.origen.x, j=puntos.origen.y; i>=minFil && i<=maxFil && j>=minCol && j<=maxCol && !flag; i+=dir.x, j+=dir.y)
     {
+        punto_t posActual = {i,j};
+        movimiento_t puntos = {posActual, puntos.destino};
+        
         if((c = tablero.v[i][j]) != VACIO && c != boton)
             flag = 2; //ya que debe salir del ciclo for pero luego retornar 0
-        else if(cmp({{i,j}, puntos.destino}, boton, c))
+        else if((*cmp)(puntos, boton, c))
             flag = 1;
     }
 
@@ -217,7 +220,6 @@ static void calcularMovPc(matriz_t tablero, movimiento_t * mov)
 static int calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, char boton, int (*cond)(int,char,char), size_t dim, movimiento_t * mov_vec)
 {
     int i,j, cantBtns = 0;
-    char c;
 
     for(i=pos.x, j=pos.y; (*cond)(cantBtns, tablero.v[i][j], boton); i+=dir.x, j+=dir.y)
     {
