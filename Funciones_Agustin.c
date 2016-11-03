@@ -116,7 +116,7 @@ void leer_movimiento(movimiento_t * mov, matriz_t tablero)
                   else if(vector[0]=='N' && vector[1]=='\n')
                              exit(1);
                        else
-                           flag_error =1;
+                           flag_error = 1;
              }
              else
              {
@@ -151,7 +151,7 @@ int menu()
         }
     } while (ultimo_caracter != '\n' || respuesta < '1' || respuesta > '4');
 
-    return respuesta;
+    return respuesta - '0';
 }
 
 
