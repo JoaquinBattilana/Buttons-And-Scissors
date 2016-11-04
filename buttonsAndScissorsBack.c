@@ -3,62 +3,24 @@
 #include "random.h"
 #include "buttonsAndScissorsBack.h"
 
-static int buscarBoton(matriz_t tablero, punto_t pos, char boton);
+static int buscarBoton(matriz_t tablero, punto_t pos);
 static void calcularMovPc(matriz_t tablero, movimiento_t * mov);
 static movimiento_t * sobreescribir(movimiento_t * mov_vec, movimiento_t mov, size_t * dim);
 static movimiento_t * agregar(movimiento_t * mov_vec, movimiento_t mov, size_t * dim);
-static int calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, char boton, int (*cond)(int,char,char), size_t dim, movimiento_t * mov_vec);
-static void limitesSubMatriz(punto_t p1, punto_t p2, int * minFil, int * maxFil, int * minCol, int * maxCol);
+static int calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, int (*cond)(int,char,char), size_t dim, movimiento_t * mov_vec);
 
 char dir_inc[INC_MAX][2] = {{0,1},{1,1},{1,0},{1,-1}}; //incremento direcciones DERECHA, D_ABAJO, ABAJO, I_ABAJO
-
-void imprimirTablero(matriz_t tablero)
-{
-    printf("\n   ");
-
-    int i, j;
-
-    for(i = 0; i < tablero.n; i++) //referencia numerica para las columnas
-        printf(" %d", i);
-
-    i=0;
-
-    printf("\n");
-
-    while(i < tablero.n)
-    {
-        printf("\n");
-
-        for(j = 0; j < tablero.n; j++)
-        {
-            if(j==0)
-                printf("%d  ", i); //referencia numerica para las filas
-
-            printf(" %c", tablero.v[i][j]);
-        }
-
-        if(j == tablero.n)
-        {
-            i++;
-        }
-    }
-
-    printf("\n\n");
-    return;
-}
-
 
 int hayMovimientosValidos(matriz_t tablero) //invocar luego de cada turno para saber si hay un ganador
 {
     int flag = 0;
-    char c;
     int i=0, j=0;
     while(i<tablero.n && j<tablero.n && !flag)
     {
-        if((c = tablero.v[i][j]) != VACIO)
+        if(tablero.v[i][j] != VACIO)
         {
             punto_t pos = {i, j};
-            flag = buscarBoton(tablero, pos, c);
+            flag = buscarBoton(tablero, pos);
         }
 
         if(++j == tablero.n)
@@ -71,7 +33,7 @@ int hayMovimientosValidos(matriz_t tablero) //invocar luego de cada turno para s
     return flag;
 }
 
-static int buscarBoton(matriz_t tablero, punto_t pos, char boton)
+static int buscarBoton(matriz_t tablero, punto_t pos)
 {
     int flag = 0;
     int i;
@@ -81,28 +43,26 @@ static int buscarBoton(matriz_t tablero, punto_t pos, char boton)
         punto_t direccion = {dir_inc[i][0], dir_inc[i][1]};
         punto_t limiteSuperior = {tablero.n-1,tablero.n-1};
         movimiento_t puntos = {pos, limiteSuperior};
-        flag = esMovimientoValido(tablero, puntos, direccion, boton, condMovimientoTurno);
+        flag = esMovimientoValido(tablero, puntos, direccion, condMovimientoTurno);
     }
 
     return flag;
 }
 
-int esMovimientoValido(matriz_t tablero, movimiento_t puntos, punto_t dir, char boton, int (*cmp)(movimiento_t, char, char))
+int esMovimientoValido(matriz_t tablero, movimiento_t puntos, punto_t dir, int (*cmp)(movimiento_t, char, char))
 {
-    int i,j, minFil, maxFil, minCol, maxCol, flag = 0;
-    char c;
+    int i,j, flag = 0;
+    char c, boton = tablero.v[puntos.origen.x][puntos.origen.y];
 
-    limitesSubMatriz(puntos.origen, puntos.destino, &minFil, &maxFil, &minCol, &maxCol);
-
-    for(i=puntos.origen.x, j=puntos.origen.y; i>=minFil && i<=maxFil && j>=minCol && j<=maxCol && !flag; i+=dir.x, j+=dir.y)
+    for(i=puntos.origen.x, j=puntos.origen.y; i>=0 && i<tablero.n && j>=0 && j<tablero.n && !flag; i+=dir.x, j+=dir.y)
     {
         punto_t posActual = {i,j};
         movimiento_t puntos = {posActual, puntos.destino};
-        
+
         if((c = tablero.v[i][j]) != VACIO && c != boton)
             flag = 2; //ya que debe salir del ciclo for pero luego retornar 0
-        else if((*cmp)(puntos, boton, c))
-            flag = 1;
+        else
+            flag = (*cmp)(puntos, boton, c);
     }
 
     return flag % 2; //para que en caso de el flag sea igual a 2, retorne 0
@@ -116,9 +76,12 @@ int condMovimientoTurno(movimiento_t puntos, char boton, char botonLeido)
 int condMovimientoJugador(movimiento_t puntos, char boton, char botonLeido)
 {
     int valorRetorno = 0;
-    if(boton == botonLeido)
         if(puntos.origen.x == puntos.destino.x && puntos.origen.y == puntos.destino.y)
-            valorRetorno = 1;
+        {
+            valorRetorno = 2; //el punto de origen no tiene un boton del mismo color
+            if(boton == botonLeido)
+                valorRetorno = 1;
+        }
 
     return valorRetorno;
 }
@@ -194,9 +157,9 @@ static void calcularMovPc(matriz_t tablero, movimiento_t * mov)
                 punto_t direccion = {dir_inc[i][0], dir_inc[i][1]};
                 punto_t posActual = {i,j};
                 if(estrategia == 0) //Movimiento Minimo
-                    dim = calcularMovPcEnDir(tablero, posActual, direccion, c, condMinMov, dim, mov_vec);
+                    dim = calcularMovPcEnDir(tablero, posActual, direccion, condMinMov, dim, mov_vec);
                 else //Movimiento Maximo
-                    dim = calcularMovPcEnDir(tablero, posActual, direccion, c, condMaxMov, dim, mov_vec);
+                    dim = calcularMovPcEnDir(tablero, posActual, direccion, condMaxMov, dim, mov_vec);
 
             }
 
@@ -217,9 +180,10 @@ static void calcularMovPc(matriz_t tablero, movimiento_t * mov)
 }
 
 
-static int calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, char boton, int (*cond)(int,char,char), size_t dim, movimiento_t * mov_vec)
+static int calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, int (*cond)(int,char,char), size_t dim, movimiento_t * mov_vec)
 {
     int i,j, cantBtns = 0;
+    char boton = tablero.v[pos.x][pos.y];
 
     for(i=pos.x, j=pos.y; (*cond)(cantBtns, tablero.v[i][j], boton); i+=dir.x, j+=dir.y)
     {

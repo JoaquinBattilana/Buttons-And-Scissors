@@ -28,7 +28,7 @@ typedef struct
     int cantBotones;
 } movimiento_t;
 
-int esMovimientoValido(matriz_t tablero, movimiento_t puntos, punto_t dir, char boton, int (*cmp)(movimiento_t, char, char));
+int esMovimientoValido(matriz_t tablero, movimiento_t puntos, punto_t dir, int (*cmp)(movimiento_t, char, char));
 
 int condMovimientoTurno(movimiento_t puntos, char boton, char botonLeido);
 
@@ -41,8 +41,6 @@ void calcularDireccion(movimiento_t mov, punto_t * direccion);
 int hayMovimientosValidos(matriz_t tablero);
 
 int realizarCortePc(matriz_t * tablero);
-
-void imprimirTablero(matriz_t tablero); //ES FRONT END, CORREGIR JE
 
 int condMaxMov(int cantBotones, char boton, char botonPosActual);
 
