@@ -6,9 +6,6 @@
 #define VACIO 0
 #define MIN_MOV 2
 
-#define MAX(a, b) (a)>(b)? (a) : (b)
-#define MIN(a, b) (a)<(b)? (a) : (b)
-
 typedef struct
 {
     char ** v;
