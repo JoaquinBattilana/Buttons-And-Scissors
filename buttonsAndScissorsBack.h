@@ -3,7 +3,7 @@
 #define _BUTTONS_AND_SCISSORS_BACK
 
 #define INC_MAX 4
-#define VACIO 0
+#define VACIO ' '
 #define MIN_MOV 2
 
 typedef struct
