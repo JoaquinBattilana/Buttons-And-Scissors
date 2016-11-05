@@ -7,7 +7,7 @@ static int buscarBoton(matriz_t tablero, punto_t pos);
 static void calcularMovPc(matriz_t tablero, movimiento_t * mov);
 static movimiento_t * sobreescribir(movimiento_t * mov_vec, movimiento_t mov, size_t * dim);
 static movimiento_t * agregar(movimiento_t * mov_vec, movimiento_t mov, size_t * dim);
-static int calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, int (*cond)(int,char,char), size_t dim, movimiento_t * mov_vec);
+static movimiento_t * calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, int (*cond)(int,char,char), size_t * dim, movimiento_t * mov_vec);
 
 char dir_inc[INC_MAX][2] = {{0,1},{1,1},{1,0},{1,-1}}; //incremento direcciones DERECHA, D_ABAJO, ABAJO, I_ABAJO
 
@@ -15,7 +15,7 @@ int hayMovimientosValidos(matriz_t tablero) //invocar luego de cada turno para s
 {
     int flag = 0;
     int i=0, j=0;
-    while(i<tablero.n && j<tablero.n && !flag)
+    while(i>=0 && i<tablero.n && j<tablero.n && j>=0 && !flag)
     {
         if(tablero.v[i][j] != VACIO)
         {
@@ -54,7 +54,7 @@ int esMovimientoValido(matriz_t tablero, movimiento_t puntos, punto_t dir, int (
     int i,j, flag = 0;
     char c, boton = tablero.v[puntos.origen.x][puntos.origen.y];
 
-    for(i=puntos.origen.x, j=puntos.origen.y; i>=0 && i<tablero.n && j>=0 && j<tablero.n && !flag; i+=dir.x, j+=dir.y)
+    for(i=puntos.origen.x+dir.x, j=puntos.origen.y+dir.y; i>=0 && i<tablero.n && j>=0 && j<tablero.n && !flag; i+=dir.x, j+=dir.y)
     {
         punto_t posActual = {i,j};
         movimiento_t p = {posActual, puntos.destino};
@@ -134,22 +134,21 @@ static void calcularMovPc(matriz_t tablero, movimiento_t * mov)
     size_t dim = 0;
     movimiento_t * mov_vec = NULL;
     int i=0, j=0;
-    char c;
     int estrategia = randInt(0, 1);
 
     while(i<tablero.n && j<tablero.n)
     {
-        if((c = tablero.v[i][j]) != VACIO)
+        if(tablero.v[i][j] != VACIO)
         {
             int k;
             for(k=0; k<INC_MAX; k++)
             {
-                punto_t direccion = {dir_inc[i][0], dir_inc[i][1]};
+                punto_t direccion = {dir_inc[k][0], dir_inc[k][1]};
                 punto_t posActual = {i,j};
                 if(estrategia == 0) //Movimiento Minimo
-                    dim = calcularMovPcEnDir(tablero, posActual, direccion, condMinMov, dim, mov_vec);
+                    mov_vec = calcularMovPcEnDir(tablero, posActual, direccion, condMinMov, &dim, mov_vec);
                 else //Movimiento Maximo
-                    dim = calcularMovPcEnDir(tablero, posActual, direccion, condMaxMov, dim, mov_vec);
+                    mov_vec = calcularMovPcEnDir(tablero, posActual, direccion, condMaxMov, &dim, mov_vec);
 
             }
 
@@ -166,43 +165,43 @@ static void calcularMovPc(matriz_t tablero, movimiento_t * mov)
 
     *mov = mov_vec[indice];
 
+    free(mov_vec); //revisra si esta bien este free asi
+
     return;
 }
 
 
-static int calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, int (*cond)(int,char,char), size_t dim, movimiento_t * mov_vec)
+static movimiento_t * calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, int (*cond)(int,char,char), size_t * dim, movimiento_t * mov_vec)
 {
     int i,j, cantBtns = 0;
     char boton = tablero.v[pos.x][pos.y];
 
-    for(i=pos.x, j=pos.y; (*cond)(cantBtns, tablero.v[i][j], boton); i+=dir.x, j+=dir.y)
+    for(i=pos.x, j=pos.y; i>=0 && i<tablero.n && j>=0 && j<tablero.n && (*cond)(cantBtns, boton, tablero.v[i][j]); i+=dir.x, j+=dir.y)
     {
-        cantBtns++;
-        if(cantBtns >= MIN_MOV)
+        if(tablero.v[i][j] == boton)
         {
-            if((dim!=0 && mov_vec[0].cantBotones <= cantBtns) || dim==0)
+            cantBtns++;
+            if (cantBtns >= MIN_MOV)
             {
-                if(dim == 0)
+                if ((*dim != 0 && mov_vec[0].cantBotones <= cantBtns) || *dim == 0)
                 {
-                    movimiento_t mov = {pos, {i,j}, cantBtns};
-                    sobreescribir(mov_vec, mov, &dim);
-                }
+                    if (*dim == 0 || mov_vec[0].cantBotones < cantBtns)
+                    {
+                        movimiento_t mov = {pos, {i, j}, cantBtns};
+                        mov_vec = sobreescribir(mov_vec, mov, dim);
+                    }
 
-                else if(mov_vec[0].cantBotones < cantBtns)
-                {
-                    movimiento_t mov = {pos, {i,j}, cantBtns};
-                    sobreescribir(mov_vec, mov, &dim);
-                }
-                else if(mov_vec[0].cantBotones == cantBtns)
-                {
-                    movimiento_t mov = {pos, {i,j}, cantBtns};
-                    agregar(mov_vec, mov, &dim);
+                    else if (mov_vec[0].cantBotones == cantBtns)
+                    {
+                        movimiento_t mov = {pos, {i, j}, cantBtns};
+                        mov_vec = agregar(mov_vec, mov, dim);
+                    }
                 }
             }
         }
     }
 
-    return dim;
+    return mov_vec;
 }
 
 int condMinMov(int cantBotones, char boton, char botonPosActual)
@@ -226,7 +225,7 @@ int condMaxMov(int cantBotones, char boton, char botonPosActual)
 static movimiento_t * sobreescribir(movimiento_t * mov_vec, movimiento_t mov, size_t * dim)
 {
     *dim = 1;
-    mov_vec = realloc(mov_vec, *dim * sizeof(*mov_vec)); //OPTIMISTA
+    mov_vec = realloc(mov_vec, *dim * sizeof(*mov_vec)); //OPTIMISTA, VALIDAR NULL
 
     mov_vec[0] = mov;
 
@@ -236,7 +235,7 @@ static movimiento_t * sobreescribir(movimiento_t * mov_vec, movimiento_t mov, si
 static movimiento_t * agregar(movimiento_t * mov_vec, movimiento_t mov, size_t * dim)
 {
     (*dim)++;
-    mov_vec = realloc(mov_vec, *dim * sizeof(*mov_vec)); //OPTIMISTA
+    mov_vec = realloc(mov_vec, *dim * sizeof(*mov_vec)); //OPTIMISTA, CORREGIR ESO
 
     mov_vec[*dim - 1] = mov;
 
