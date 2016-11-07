@@ -2,20 +2,18 @@
 #include <stdlib.h>
 #include "random.h"
 #include <ctype.h>
-#include <string.h>
 #include "buttonsAndScissorsBack.h"
-#define LIMPIAR_BUFFER() while(getchar()!='\n')
 
 enum opciones {JVSJ=1, JVSCPU, CARGAR, SALIR};
 enum ia {NOPC=0, PC};
 enum errores {SIN_ERROR=0, ERROR, E_MEM_DIN,E_ARCHIVO_MATRICES,E_ABRIR_ARCHIVO, E_NOMBRE_ARCHIVO,
-    E_CREAR_ARCHIVO, E_ARCHIVO_MAL,NO_SOBRESCRIBIR,COMANDO_INVALIDO};
+    E_CREAR_ARCHIVO, E_ARCHIVO_MAL,NO_SOBRESCRIBIR,COMANDO_INVALIDO,DISTINTO_COLOR,DIR_INVALIDA,ENTRE_BOTONES,VEC_NULL,MUY_LARGO,MISMO_BOT,FUERA_MATRIZ_1,FUERA_MATRIZ_2,no_print};
 
 #define JUGADORES 2
 #define MAXLARGOARCHIVO 255
 #define MAXNPALABRA 9
 #define BLOQUE 10
-
+#define LIMPIAR_BUFFER() while(getchar()!='\n')
 
 typedef struct{
     int botones_cortados;
@@ -38,7 +36,8 @@ static char ** creaMatrizCuadrada(size_t n);
 static void liberarMatrizCuadrada(matriz_t tablero);
 void imprimirTablero(matriz_t tablero);
 int cargarJuego(tipoJuego * juego);
-void leer_movimiento(movimiento_t * mov, tipoJuego * juego);
+int guardar_nombre(char * s);
+int leer_movimiento(movimiento_t * mov, tipoJuego * juego);
 static int leerArchivo(char * nombreArchivo, tipoJuego * juego);
 void printError(int error);
 int guardarJuego(char * nombreArchivo, tipoJuego * juego);
@@ -64,7 +63,7 @@ int main(void){
                 else {
                     if (opcion == JVSCPU)
                         jugadores[JUGADORES - 1].esPC = 1;
-                    jugar(&juego, jugadores);
+                    salir = jugar(&juego, jugadores);
                 }
                 break;
             case CARGAR:
@@ -73,9 +72,9 @@ int main(void){
                     printError(error);
                 else
                 {
-                    if(juego.modoJuego==1)
-                        jugadores[JUGADORES-1].esPC=1;
-                    jugar(&juego, jugadores);
+                if(juego.modoJuego==1)
+                    jugadores[JUGADORES-1].esPC=1;
+                salir = jugar(&juego, jugadores);
                 }
                 break;
             case SALIR:
@@ -83,9 +82,7 @@ int main(void){
                 break;
         }
     }while(!salir);
-
     return 0;
-
 }
 
 int jugar(tipoJuego * juego, jugador jugadores[JUGADORES]){
@@ -100,15 +97,17 @@ int jugar(tipoJuego * juego, jugador jugadores[JUGADORES]){
         switch(jugadores[juego->turno].esPC)
         {
             case NOPC:
-                leer_movimiento(&mov, juego);
-                calcularDireccion(mov, &direccion);
-                jugadores[juego->turno].botones_cortados += realizarCorte(&(juego->tablero), mov, direccion);
+                flag = leer_movimiento(&mov, juego);
+                if(!flag) {
+                    calcularDireccion(mov, &direccion);
+                    jugadores[juego->turno].botones_cortados += realizarCorte(&(juego->tablero), mov, direccion);
+                }
                 break;
             case PC:
                 jugadores[juego->turno].botones_cortados += realizarCortePc(&(juego->tablero));
                 break;
         }
-        if(!hayMovimientosValidos(juego->tablero))
+        if(!flag && !hayMovimientosValidos(juego->tablero))
         {
             printf("Gano el jugador %d\n", juego->turno);
             liberarMatrizCuadrada(juego->tablero);
@@ -187,7 +186,7 @@ int matrizDsdArchivo(tipoJuego * juego){
     int error=SIN_ERROR;
     int c;
     char nombreArchivo[50], whitespace=0; //cambiar el por 10 en nombrearchivo
-    sprintf(nombreArchivo, "/home/dn/Desktop/TPE/%dx%d", juego->tablero.n,juego->tablero.n );//Cambie el path para probar en clion
+    sprintf(nombreArchivo, "/home/ubuntu/ClionProjects/TPE/%dx%d", juego->tablero.n,juego->tablero.n );//Cambie el path para probar en clion
     char ** aux=NULL;
     FILE * archivo;
     archivo = fopen(nombreArchivo, "r");
@@ -315,51 +314,118 @@ void imprimirTablero(matriz_t tablero) {
     return;
 }
 
-void leer_movimiento(movimiento_t * mov, tipoJuego * juego)
+int guardar_nombre(char * s) {
+    s = NULL;
+    char * aux = NULL;
+    int i, c, error = SIN_ERROR;
+    for (i = 0; (c = getchar()) != '\n' && i < 255 && !error; i++) {
+        if (i % BLOQUE == 0) {
+            aux = realloc(s, (i + BLOQUE) * sizeof(char));
+            if (aux == NULL) {
+                error = E_MEM_DIN;
+                free(s);
+            }
+            else
+                s = aux;
+        }
+        s[i] = c;
+    }
+    if (!error && s == NULL)
+    {
+        error = VEC_NULL;
+    }
+    else
+    {
+        realloc(s, ++i);
+        s[i] = '\0';
+    }
+    if(!error && i == 254 && c != '\n')
+    {
+        LIMPIAR_BUFFER();
+        error = MUY_LARGO;
+        free(s);
+    }
+    return  error;
+}
+
+int leer_movimiento(movimiento_t * mov, tipoJuego * juego)
 {
-    char flag_caracter, caracter;
-    int flag_error=1;
+    char flag_caracter, caracter, flag_salir = 0, * archivo;
+    int flag_error, n;
     do
     {
-        printf("Ingrese el comando: ");
+        flag_error = no_print;
+        n =0;
+        printf("Ingreses el comando: ");
         flag_caracter = getchar();
         switch(flag_caracter) {
             case '[':
-                scanf("%d,%d] [%d,%d]%c", &mov->origen.x, &mov->origen.y, &mov->destino.x, &mov->destino.y,
+                n = scanf("%d,%d] [%d,%d]%c", &mov->origen.x, &mov->origen.y, &mov->destino.x, &mov->destino.y,
                       &flag_caracter);
-                if (flag_caracter == '\n')
+                if (flag_caracter == '\n' && n == 5)
                     flag_error = validarMovimiento(mov, juego->tablero);
                 else
+                {
                     flag_error = COMANDO_INVALIDO;
+                    LIMPIAR_BUFFER();
+                }
                 break;
             case 's':
-                scanf("avegame%c", &flag_caracter);
-                if (flag_caracter == ' ');//guargar de foma dinamica
+                n = scanf("avegame%c", &flag_caracter);
+                if (flag_caracter == ' ' && n == 1) {
+                    flag_error = guardar_nombre(archivo);
+                    if (!flag_error)
+                        flag_error = guardarJuego(archivo, juego);
+                }
                 else
+                {
                     flag_error = COMANDO_INVALIDO;
+                    if(flag_caracter != '\n' && flag_caracter != 0)
+                        LIMPIAR_BUFFER();
+                }
                 break;
             case 'q':
-                scanf("uit%c", &flag_caracter);
-                if (flag_caracter == '\n') {
+                n = scanf("uit%c", &flag_caracter);
+                if (flag_caracter == '\n' && n == 1) {
                     printf("¿Está seguro que quiere salir (Y/N)? ");
                     if ((caracter = getchar()) == 'Y' && (flag_caracter = getchar()) == '\n') {
                         printf("¿Desea guardar la partida antes de salir (Y/N)? ");
                         if ((caracter = getchar()) == 'Y' && (flag_caracter = getchar()) == '\n') {
                             printf("Ingrese el nombre del archivo: ");
-                            //guardar de forma dinamica
-                        } else if (caracter == 'N' && flag_caracter == '\n');//salir
-                        else
-                            flag_error = 1;
-                    } else if (caracter == 'N' && flag_caracter == '\n');//no salir
-                    else
-                        flag_error = 1;
+                            flag_error = guardar_nombre(archivo);
+                            if(!flag_error)
+                                flag_error = guardarJuego(archivo,juego);
+                            flag_salir = 1;
+                        }
+                        else if (caracter == 'N' && flag_caracter == '\n')
+                            flag_salir = 1;                                            //sale
+                        else {
+                            flag_error = COMANDO_INVALIDO;
+                            LIMPIAR_BUFFER();
+                        }
+                    }
+                    else if(caracter == 'N' && flag_caracter == '\n')
+                            flag_salir = 0;
+                        else {
+                        flag_error = COMANDO_INVALIDO;
+                        LIMPIAR_BUFFER();
+                    }
                 }
+                else
+                    LIMPIAR_BUFFER();
                 break;
             default:
                 if(flag_caracter != '\n')
                     LIMPIAR_BUFFER();
         }
-    }while (flag_error);
+        if(flag_error == FUERA_MATRIZ_1)
+            printf("No existe la posición [%d,%d]\n", mov->origen.x, mov->origen.y);
+        else if(flag_error == FUERA_MATRIZ_2)
+            printf("No existe la posición [%d,%d]\n", mov->destino.x, mov->destino.y);
+        else if(flag_error != no_print && flag_error)
+        printError(flag_error);
+    }while (flag_error && !flag_salir);
+    return flag_salir;
 }
 
 
@@ -368,25 +434,25 @@ int validarMovimiento(movimiento_t * mov, matriz_t tablero)
     double pendiente;
     int flag = 0;
     if(mov->origen.x == mov->destino.x && mov->origen.y == mov->destino.y) //mismo punto
-        flag = ERROR;
+        flag = MISMO_BOT;
     else if (mov->origen.x >= tablero.n || mov->origen.y >= tablero.n || mov->origen.x < 0 || mov->origen.y < 0) //fuera de matriz
-        flag = 5;
+        flag = FUERA_MATRIZ_1;
     else if (mov->destino.x >= tablero.n || mov->destino.y >= tablero.n || mov->destino.x < 0 || mov->destino.y < 0) //fuera de matriz
-        flag = 6;
+        flag = FUERA_MATRIZ_2;
     else if (tablero.v[mov->origen.x][mov->origen.y] !=    tablero.v[mov->destino.x][mov->destino.y])
-        flag = 7;
+    flag = DISTINTO_COLOR;
     else if (mov->origen.x-mov->destino.x != 0)
     {
         pendiente = ((double)mov->destino.y - mov->origen.y)/(mov->destino.x - mov->origen.x);
         if (pendiente != 0 && pendiente != 1 && pendiente != -1)
-            flag=ERROR;
+        flag = DIR_INVALIDA;
     }
     else
     {
         punto_t direccion;
         calcularDireccion(*mov, &direccion);
         if(!esMovimientoValido(tablero, *mov, direccion, condMovimientoJugador))
-            flag = 8;
+            flag = ENTRE_BOTONES;
     }
 
     return flag;
@@ -463,8 +529,10 @@ void printError(int error){
     char * s_errores[]={"No hay error\n", "Error\n", "Error en la memoria dinamica\n", "Error, el archivo de matrices esta mal hecho\n",
                         "Error, el archivo esta corrupto o no existe\n", "Error en el nombre de archivo \n",
                         "Error al crear/sobrescribir el archivo \n", "El archivo esta corrupto o mal escrito\n",
-                        "Elija otro nombre \n"};
-    printf("%s\n", s_errores[error]);
+                        "Elija otro nombre\n", "Comando invalido\n", "El corte no tiene una única variedad de botones\n",
+                        "Dirección invalida\n", "El corte no tiene una única variedad de botones\n", "El nombre del archivo no puede ser nulo\n",
+                        "El nombre del archivo es muy largo\n", "El corte esta compuesto por solo un boton\n"};
+        printf("%s", s_errores[error]);
     return;
 }
 
