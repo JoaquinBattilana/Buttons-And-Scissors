@@ -9,7 +9,7 @@ static movimiento_t * sobreescribir(movimiento_t * mov_vec, movimiento_t mov, si
 static movimiento_t * agregar(movimiento_t * mov_vec, movimiento_t mov, size_t * dim);
 static movimiento_t * calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, int (*cond)(int,char,char), size_t * dim, movimiento_t * mov_vec);
 
-char dir_inc[INC_MAX][2] = {{0,1},{1,1},{1,0},{1,-1}}; //incremento direcciones DERECHA, D_ABAJO, ABAJO, I_ABAJO
+static char dir_inc[INC_MAX][2] = {{0,1},{1,1},{1,0},{1,-1}}; //incremento direcciones DERECHA, D_ABAJO, ABAJO, I_ABAJO
 
 int hayMovimientosValidos(matriz_t tablero) //invocar luego de cada turno para saber si hay un ganador
 {
