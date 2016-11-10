@@ -316,40 +316,6 @@ void imprimirTablero(matriz_t tablero) {
     return;
 }
 
-int guardar_nombre(char * s) {
-    s = NULL;
-    char * aux = NULL;
-    int i, c, error = SIN_ERROR;
-    for (i = 0; (c = getchar()) != '\n' && i < FILENAME_MAX + 1 && !error; i++) {
-        if (i % BLOQUE == 0) {
-            aux = realloc(s, (i + BLOQUE) * sizeof(char));
-            if (aux == NULL) {
-                error = E_MEM_DIN;
-                free(s);
-            }
-            else
-                s = aux;
-        }
-        s[i] = c;
-    }
-    if (!error && s == NULL)
-    {
-        error = VEC_NULL;
-    }
-    else
-    {
-        realloc(s, ++i);
-        s[i] = '\0';
-    }
-    if(!error && i == FILENAME_MAX + 1 && c != '\n')
-    {
-        LIMPIAR_BUFFER();
-        error = MUY_LARGO;
-        free(s);
-    }
-    return  error;
-}
-
 int leer_movimiento(movimiento_t * mov, tipoJuego * juego)
 {
     char flag_caracter, caracter, flag_salir = 0, comando[FILENAME_MAX+SAVEGAME+1];
@@ -408,11 +374,13 @@ int leer_movimiento(movimiento_t * mov, tipoJuego * juego)
                             } else if (caracter == 'N' && flag_caracter == '\n')
                                 flag_salir = 1;                                            //sale
                             else {
+                                LIMPIAR_BUFFER()
                                 flag_error = COMANDO_INVALIDO;
                             }
                         } else if (caracter == 'N' && flag_caracter == '\n')
                             flag_salir = 0;
                         else {
+                            LIMPIAR_BUFFER()
                             flag_error = COMANDO_INVALIDO;
                         }
                     }
