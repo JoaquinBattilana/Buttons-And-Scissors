@@ -36,7 +36,6 @@ static char ** creaMatrizCuadrada(size_t n);
 static void liberarMatrizCuadrada(matriz_t tablero);
 void imprimirTablero(matriz_t tablero);
 int cargarJuego(tipoJuego * juego);
-int guardar_nombre(char * s);
 int leer_movimiento(movimiento_t * mov, tipoJuego * juego);
 static int leerArchivo(char * nombreArchivo, tipoJuego * juego);
 void printError(int error);
