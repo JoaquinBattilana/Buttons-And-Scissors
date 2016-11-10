@@ -454,7 +454,7 @@ int validarMovimiento(movimiento_t * mov, matriz_t tablero)
     {
         punto_t direccion;
         calcularDireccion(*mov, &direccion);
-        if(!esMovimientoValido(tablero, *mov, direccion, condMovimientoJugador))
+        if(hayBtnsEntreMedio(tablero, *mov, direccion))
             flag = ENTRE_BOTONES;
     }
 

@@ -3,13 +3,23 @@
 #include "random.h"
 #include "buttonsAndScissorsBack.h"
 
+static movimiento_t * calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, int (*cond)(int,char,char), size_t * dim, movimiento_t * mov_vec);
 static int buscarBoton(matriz_t tablero, punto_t pos);
 static void calcularMovPc(matriz_t tablero, movimiento_t * mov);
+static int esMovimientoValido(matriz_t tablero, movimiento_t puntos, punto_t dir, int (*cmp)(movimiento_t, char, char));
 static movimiento_t * sobreescribir(movimiento_t * mov_vec, movimiento_t mov, size_t * dim);
 static movimiento_t * agregar(movimiento_t * mov_vec, movimiento_t mov, size_t * dim);
-static movimiento_t * calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, int (*cond)(int,char,char), size_t * dim, movimiento_t * mov_vec);
+static int condMovimientoTurno(movimiento_t puntos, char boton, char botonLeido);
+static int condMovimientoJugador(movimiento_t puntos, char boton, char botonLeido);
+static int condMaxMov(int cantBotones, char boton, char botonPosActual);
+static int condMinMov(int cantBotones, char boton, char botonPosActual);
 
 static char dir_inc[INC_MAX][2] = {{0,1},{1,1},{1,0},{1,-1}}; //incremento direcciones DERECHA, D_ABAJO, ABAJO, I_ABAJO
+
+int hayBtnsEntreMedio(matriz_t tablero, movimiento_t puntos, punto_t dir)
+{ 
+	return !esMovimientoValido(tablero, *mov, direccion, condMovimientoJugador);
+}
 
 int hayMovimientosValidos(matriz_t tablero) //invocar luego de cada turno para saber si hay un ganador
 {
@@ -49,7 +59,7 @@ static int buscarBoton(matriz_t tablero, punto_t pos)
     return flag;
 }
 
-int esMovimientoValido(matriz_t tablero, movimiento_t puntos, punto_t dir, int (*cmp)(movimiento_t, char, char))
+static int esMovimientoValido(matriz_t tablero, movimiento_t puntos, punto_t dir, int (*cmp)(movimiento_t, char, char))
 {
     int i,j, flag = 0;
     char c, boton = tablero.v[puntos.origen.x][puntos.origen.y];
@@ -68,12 +78,12 @@ int esMovimientoValido(matriz_t tablero, movimiento_t puntos, punto_t dir, int (
     return flag % 2; //para que en caso de el flag sea igual a 2, retorne 0
 }
 
-int condMovimientoTurno(movimiento_t puntos, char boton, char botonLeido)
+static int condMovimientoTurno(movimiento_t puntos, char boton, char botonLeido)
 {
     return (boton == botonLeido);
 }
 
-int condMovimientoJugador(movimiento_t puntos, char boton, char botonLeido)
+static int condMovimientoJugador(movimiento_t puntos, char boton, char botonLeido)
 {
     int valorRetorno = 0;
     if(puntos.origen.x == puntos.destino.x && puntos.origen.y == puntos.destino.y)
@@ -204,7 +214,7 @@ static movimiento_t * calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t 
     return mov_vec;
 }
 
-int condMinMov(int cantBotones, char boton, char botonPosActual)
+static int condMinMov(int cantBotones, char boton, char botonPosActual)
 {
     int continuarCiclo = 0;
     if((botonPosActual == boton || botonPosActual == VACIO) && cantBotones < MIN_MOV)
@@ -213,7 +223,7 @@ int condMinMov(int cantBotones, char boton, char botonPosActual)
     return continuarCiclo;
 }
 
-int condMaxMov(int cantBotones, char boton, char botonPosActual)
+static int condMaxMov(int cantBotones, char boton, char botonPosActual)
 {
     int continuarCiclo = 0;
     if(botonPosActual == boton || botonPosActual == VACIO)

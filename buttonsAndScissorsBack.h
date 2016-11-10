@@ -25,12 +25,6 @@ typedef struct
     int cantBotones;
 } movimiento_t;
 
-int esMovimientoValido(matriz_t tablero, movimiento_t puntos, punto_t dir, int (*cmp)(movimiento_t, char, char));
-
-int condMovimientoTurno(movimiento_t puntos, char boton, char botonLeido);
-
-int condMovimientoJugador(movimiento_t puntos, char boton, char botonLeido);
-
 int realizarCorte(matriz_t * tablero, movimiento_t mov, punto_t dir);
 
 void calcularDireccion(movimiento_t mov, punto_t * direccion);
@@ -39,8 +33,6 @@ int hayMovimientosValidos(matriz_t tablero);
 
 int realizarCortePc(matriz_t * tablero);
 
-int condMaxMov(int cantBotones, char boton, char botonPosActual);
-
-int condMinMov(int cantBotones, char boton, char botonPosActual);
+int hayBtnsEntreMedio(matriz_t tablero, movimiento_t puntos, punto_t dir)
 
 #endif
