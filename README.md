@@ -7,5 +7,5 @@ hackerman
 -Ingresar comando doble printeo
 -ver si falta algun define para que quede mas chetin
 -revisado general
-#NO_PRINT
+#agkuygjfghkdgfhasdbuilf
 #JOACO TESTEA PUTITA
