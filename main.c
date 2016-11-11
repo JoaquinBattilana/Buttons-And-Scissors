@@ -1,7 +1,7 @@
 #include "buttonsAndScissorsFront.h"
 
 int main(void){
-    printf("Bienvenido al juego de botones y tijeras. \n");
+    printf("\nBienvenido al juego de botones y tijeras. \n");
     randomize(); //setea semilla
     int opcion,salir=0,error=SIN_ERROR;
     tipoJuego juego;

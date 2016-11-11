@@ -7,8 +7,7 @@ static movimiento_t * calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t 
 static int buscarBoton(matriz_t tablero, punto_t pos);
 static void calcularMovPc(matriz_t tablero, movimiento_t * mov);
 static int esMovimientoValido(matriz_t tablero, movimiento_t puntos, punto_t dir, int (*cmp)(movimiento_t, char, char));
-static movimiento_t * sobreescribir(movimiento_t * mov_vec, movimiento_t mov, size_t * dim);
-static movimiento_t * agregar(movimiento_t * mov_vec, movimiento_t mov, size_t * dim);
+static movimiento_t * agregarMovimiento(movimiento_t * mov_vec, movimiento_t mov, size_t * dim);
 static int condMovimientoTurno(movimiento_t puntos, char boton, char botonLeido);
 static int condMovimientoJugador(movimiento_t puntos, char boton, char botonLeido);
 static int condMaxMov(int cantBotones, char boton, char botonPosActual);
@@ -50,7 +49,7 @@ int validarMovimiento(movimiento_t * mov, matriz_t tablero)
     return flag;
 }
 
-int hayMovimientosValidos(matriz_t tablero) //invocar luego de cada turno para saber si hay un ganador
+int hayMovimientosValidos(matriz_t tablero) //se invoca luego de cada turno para saber si hay un ganador
 {
     int flag = 0;
     int i=0, j=0;
@@ -186,7 +185,7 @@ static void calcularMovPc(matriz_t tablero, movimiento_t * mov)
                 punto_t posActual = {i,j};
                 if(estrategia == 0) //Movimiento Minimo
                     mov_vec = calcularMovPcEnDir(tablero, posActual, direccion, condMinMov, &dim, mov_vec);
-                else //Movimiento Maximo
+                else                //Movimiento Maximo
                     mov_vec = calcularMovPcEnDir(tablero, posActual, direccion, condMaxMov, &dim, mov_vec);
 
             }
@@ -222,19 +221,13 @@ static movimiento_t * calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t 
             cantBtns++;
             if (cantBtns >= MIN_MOV)
             {
-                if ((*dim != 0 && mov_vec[0].cantBotones <= cantBtns) || *dim == 0)
+              if (*dim == 0 || mov_vec[0].cantBotones <= cantBtns)
                 {
                     if (*dim == 0 || mov_vec[0].cantBotones < cantBtns)
-                    {
-                        movimiento_t mov = {pos, {i, j}, cantBtns};
-                        mov_vec = sobreescribir(mov_vec, mov, dim);
-                    }
+                        *dim = 0;
 
-                    else if (mov_vec[0].cantBotones == cantBtns)
-                    {
-                        movimiento_t mov = {pos, {i, j}, cantBtns};
-                        mov_vec = agregar(mov_vec, mov, dim);
-                    }
+                    movimiento_t mov = {pos, {i, j}, cantBtns};
+                    mov_vec = agregarMovimiento(mov_vec, mov, dim);
                 }
             }
         }
@@ -261,17 +254,7 @@ static int condMaxMov(int cantBotones, char boton, char botonPosActual)
     return continuarCiclo;
 }
 
-static movimiento_t * sobreescribir(movimiento_t * mov_vec, movimiento_t mov, size_t * dim)
-{
-    *dim = 1;
-    mov_vec = realloc(mov_vec, *dim * sizeof(*mov_vec)); //OPTIMISTA
-
-    mov_vec[0] = mov;
-
-    return  mov_vec;
-}
-
-static movimiento_t * agregar(movimiento_t * mov_vec, movimiento_t mov, size_t * dim)
+static movimiento_t * agregarMovimiento(movimiento_t * mov_vec, movimiento_t mov, size_t * dim)
 {
     (*dim)++;
     mov_vec = realloc(mov_vec, *dim * sizeof(*mov_vec)); //OPTIMISTA

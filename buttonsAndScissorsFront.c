@@ -12,8 +12,7 @@ int jugar(tipoJuego * juego, jugador jugadores[JUGADORES]){
     punto_t direccion;
     movimiento_t mov;
     do{
-        printf("Botones J1: %d, J2: %d\n", jugadores[0].botones_cortados, jugadores[1].botones_cortados);
-        imprimirTablero(juego->tablero);
+        imprimirTablero(juego->tablero, jugadores);
         printf("Turno jugador %d\n", juego->turno);
         switch(jugadores[juego->turno-1].esPC)
         {
@@ -30,6 +29,7 @@ int jugar(tipoJuego * juego, jugador jugadores[JUGADORES]){
         }
         if(!flag && !hayMovimientosValidos(juego->tablero))
         {
+            imprimirTablero(juego->tablero, jugadores);
             printf("Gano el jugador %d\n", juego->turno);
             liberarMatrizCuadrada(juego->tablero);
             flag = validar_volvermenu();
@@ -38,7 +38,7 @@ int jugar(tipoJuego * juego, jugador jugadores[JUGADORES]){
             juego->turno = (juego->turno)%JUGADORES+1;
     }while (!flag);
 
-    return flag;
+    return flag%2;
 }
 
 
@@ -48,7 +48,7 @@ int menu()
     int respuesta;
     do
     {
-        printf("Menu principal:\n");
+        printf("\nMenu principal:\n");
         printf("1-Juego de dos jugadores\n");
         printf("2-Juego contra computadora\n");
         printf("3-Recuperar un juego grabado\n");
@@ -68,41 +68,63 @@ int menu()
     return respuesta-'0';
 }
 
-size_t validar_dim(){
-    size_t dim = 0;
-    char ultimo_caracter;
-    do{
-        ultimo_caracter = '\0';
+size_t validar_dim()
+{
+    size_t dim;
+    int flag = 0;
+    char c;
+    do
+    {
+        dim = 0;
         printf("Ingrese la dimension del tablero (minimo 5 y maximo 30): ");
-        scanf("%ld%c", &dim, &ultimo_caracter);
+        if(isdigit(c = getchar()))
+        {
+            dim += c - '0';
+            if(isdigit(c = getchar()) && getchar() == '\n')
+            {
+                dim = dim*10 + c-'0';
+                if(dim >= 5 && dim <= 30)
+                    flag = 1;
+            }
+            else if(c == '\n' && dim >= 5)
+                    flag = 1;
+            else if(c != '\n')
+                LIMPIAR_BUFFER();
+        }
+        else if(c != '\n')
+            LIMPIAR_BUFFER();
     }
-    while(ultimo_caracter != '\n' || dim < 5 || dim > 30);
+    while(!flag);
+
     return dim;
 }
 
 int validar_volvermenu(void)
 {
-    int flag = 1;
-    int ultimo_caracter;
-    printf("¿Desea volver al menu o salir (M\\S)?: ");
-    do{
-        ultimo_caracter = '\0';
-        if (toupper(getchar()) == 'M' && (ultimo_caracter = getchar()) == '\n'){
-            flag = 0;
+    int flag = 0;
+    int c;
+    do
+    {
+        printf("Desea volver al menu o salir (M\\S)?: ");
+        if ((c=toupper(getchar())) == 'M' &&  getchar() == '\n'){
+            flag = 2;
         }
-        else if (toupper(getchar()) == 'S' && (ultimo_caracter = getchar()) == '\n'){
-            flag = 0;
+        else if (c == 'S' && getchar() == '\n'){
+            flag = 1;
         }
-        else{
-            printf("Formato invalido.");
-        }
-        if (ultimo_caracter != '\n')
+        else if(c != '\n')
         {
             LIMPIAR_BUFFER();
         }
+
+        if(!flag)
+        {
+            printError(COMANDO_INVALIDO);
+        }
+
     }
-    while(flag);
-    return !flag;
+    while(!flag);
+    return flag;
 }
 
 int matrizDsdArchivo(tipoJuego * juego){
@@ -213,7 +235,8 @@ static void liberarMatrizCuadrada(matriz_t tablero){
     return;
 }
 
-void imprimirTablero(matriz_t tablero) {
+void imprimirTablero(matriz_t tablero, jugador * jugadores) {
+    printf("Botones J1: %d, J2: %d\n", jugadores[0].botones_cortados, jugadores[1].botones_cortados);
     printf("\n   ");
     int i, j;
     for(i = 0; i < tablero.n; i++) //referencia numerica para las columnas
@@ -281,9 +304,9 @@ int leer_movimiento(movimiento_t * mov, tipoJuego * juego)
                 case 'q':
                     n = sscanf(comando, "quit%c", &flag_caracter);
                     if (flag_caracter == '\n' && n == 1) {
-                        printf("¿Esta seguro que quiere salir (Y/N)? ");
+                        printf("Esta seguro que quiere salir (Y/N)? ");
                         if (toupper((caracter = getchar())) == 'Y' && (flag_caracter = getchar()) == '\n') {
-                            printf("¿Desea guardar la partida antes de salir (Y/N)? ");
+                            printf("Desea guardar la partida antes de salir (Y/N)? ");
                             if (toupper((caracter = getchar())) == 'Y' && (flag_caracter = getchar()) == '\n') {
                                 printf("Ingrese el nombre del archivo: ");
                                 fgets(comando, FILENAME_MAX + 1, stdin);
@@ -292,11 +315,11 @@ int leer_movimiento(movimiento_t * mov, tipoJuego * juego)
                                 if (flag_error == SIN_ERROR) {
                                     flag_error = NO_PRINT;
                                     printf("Se ha guardado exitosamente la partida\n");
+                                    flag_salir = 1;
                                 }
-                                flag_salir = 1;
                             } else if (toupper(caracter) == 'N' && flag_caracter == '\n')
                                 flag_salir = 1;
-                            else {
+                            else{
                                 LIMPIAR_BUFFER()
                                     flag_error = COMANDO_INVALIDO;
                             }

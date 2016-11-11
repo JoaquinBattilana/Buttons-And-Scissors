@@ -32,7 +32,7 @@ typedef struct tipoJuego{
 int menu();
 size_t validar_dim();
 int matrizDsdArchivo(tipoJuego * juego);
-void imprimirTablero(matriz_t tablero);
+void imprimirTablero(matriz_t tablero, jugador * jugadores);
 int cargarJuego(tipoJuego * juego);
 int leer_movimiento(movimiento_t * mov, tipoJuego * juego);
 void printError(int error);
