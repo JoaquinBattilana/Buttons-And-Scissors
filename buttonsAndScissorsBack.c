@@ -204,7 +204,7 @@ static void calcularMovPc(matriz_t tablero, movimiento_t * mov)
 
     *mov = mov_vec[indice];
 
-    free(mov_vec); //revisra si esta bien este free asi
+    free(mov_vec);
 
     return;
 }
@@ -264,7 +264,7 @@ static int condMaxMov(int cantBotones, char boton, char botonPosActual)
 static movimiento_t * sobreescribir(movimiento_t * mov_vec, movimiento_t mov, size_t * dim)
 {
     *dim = 1;
-    mov_vec = realloc(mov_vec, *dim * sizeof(*mov_vec)); //OPTIMISTA, VALIDAR NULL
+    mov_vec = realloc(mov_vec, *dim * sizeof(*mov_vec)); //OPTIMISTA
 
     mov_vec[0] = mov;
 
@@ -274,7 +274,7 @@ static movimiento_t * sobreescribir(movimiento_t * mov_vec, movimiento_t mov, si
 static movimiento_t * agregar(movimiento_t * mov_vec, movimiento_t mov, size_t * dim)
 {
     (*dim)++;
-    mov_vec = realloc(mov_vec, *dim * sizeof(*mov_vec)); //OPTIMISTA, CORREGIR ESO
+    mov_vec = realloc(mov_vec, *dim * sizeof(*mov_vec)); //OPTIMISTA
 
     mov_vec[*dim - 1] = mov;
 
