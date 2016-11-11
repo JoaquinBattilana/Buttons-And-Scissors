@@ -18,7 +18,36 @@ static char dir_inc[INC_MAX][2] = {{0,1},{1,1},{1,0},{1,-1}}; //incremento direc
 
 int hayBtnsEntreMedio(matriz_t tablero, movimiento_t puntos, punto_t dir)
 { 
-	return !esMovimientoValido(tablero, *mov, direccion, condMovimientoJugador);
+	return !esMovimientoValido(tablero, puntos, dir, condMovimientoJugador);
+}
+
+int validarMovimiento(movimiento_t * mov, matriz_t tablero)
+{
+    double pendiente;
+    int flag = SIN_ERROR;
+    if(mov->destino.x >= tablero.n || mov->destino.y >= tablero.n || mov->destino.x < 0 || mov->destino.y < 0) //fuera de matriz
+        flag = FUERA_MATRIZ_2;
+    else if (mov->origen.x >= tablero.n || mov->origen.y >= tablero.n || mov->origen.x < 0 || mov->origen.y < 0) //fuera de matriz
+        flag = FUERA_MATRIZ_1;
+    else if (mov->origen.x == mov->destino.x && mov->origen.y == mov->destino.y) //mismo punto
+        flag = MISMO_BOT;
+    else if (tablero.v[mov->origen.x][mov->origen.y] !=    tablero.v[mov->destino.x][mov->destino.y])
+        flag = DISTINTO_COLOR;
+    else if (mov->origen.x-mov->destino.x != 0)
+    {
+        pendiente = ((double)mov->destino.y - mov->origen.y)/(mov->destino.x - mov->origen.x);
+        if (pendiente != 0 && pendiente != 1 && pendiente != -1)
+            flag = DIR_INVALIDA;
+    }
+    else
+    {
+        punto_t direccion;
+        calcularDireccion(*mov, &direccion);
+        if(hayBtnsEntreMedio(tablero, *mov, direccion))
+            flag = ENTRE_BOTONES;
+    }
+
+    return flag;
 }
 
 int hayMovimientosValidos(matriz_t tablero) //invocar luego de cada turno para saber si hay un ganador
