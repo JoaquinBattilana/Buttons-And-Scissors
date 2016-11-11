@@ -38,7 +38,7 @@ int jugar(tipoJuego * juego, jugador jugadores[JUGADORES]){
             juego->turno = (juego->turno)%JUGADORES+1;
     }while (!flag);
 
-    return flag; //lo puse para que no joda mas, REVISAR ESTO
+    return flag;
 }
 
 
@@ -87,10 +87,10 @@ int validar_volvermenu(void)
     printf("¿Desea volver al menu o salir (M\\S)?: ");
     do{
         ultimo_caracter = '\0';
-        if (getchar() == 'M' && (ultimo_caracter = getchar()) == '\n'){
+        if (toupper(getchar()) == 'M' && (ultimo_caracter = getchar()) == '\n'){
             flag = 0;
         }
-        else if (getchar() == 'S' && (ultimo_caracter = getchar()) == '\n'){
+        else if (toupper(getchar()) == 'S' && (ultimo_caracter = getchar()) == '\n'){
             flag = 0;
         }
         else{
