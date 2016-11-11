@@ -73,7 +73,7 @@ size_t validar_dim(){
     char ultimo_caracter;
     do{
         ultimo_caracter = '\0';
-        printf("Ingrese la dimension del tablero (minimo 5 y máximo 30): ");
+        printf("Ingrese la dimension del tablero (minimo 5 y maximo 30): ");
         scanf("%ld%c", &dim, &ultimo_caracter);
     }
     while(ultimo_caracter != '\n' || dim < 5 || dim > 30);
@@ -108,8 +108,8 @@ int validar_volvermenu(void)
 int matrizDsdArchivo(tipoJuego * juego){
     int error=SIN_ERROR;
     int c;
-    char nombreArchivo[69], whitespace=0; //cambiar el por 10 en nombrearchivo
-    sprintf(nombreArchivo, "/home/dn/Desktop/TP-listorti/%ldx%ld", juego->tablero.n,juego->tablero.n );//Cambie el path para probar en clion
+    char nombreArchivo[10], whitespace=0;
+    sprintf(nombreArchivo, "./%ldx%ld", juego->tablero.n,juego->tablero.n );
     char ** aux=NULL;
     FILE * archivo;
     archivo = fopen(nombreArchivo, "r");
@@ -226,7 +226,7 @@ void imprimirTablero(matriz_t tablero) {
         for(j = 0; j < tablero.n; j++)
         {
             if(j==0)
-                i>9? printf("%d ", i) : printf("%d  ", i); //ref numerica para filas
+                i>9? printf("%d ", i) : printf("%d  ", i); //referencia numerica para filas
             printf(" %c", tablero.v[i][j]);
         }
         if(j == tablero.n)
@@ -281,7 +281,7 @@ int leer_movimiento(movimiento_t * mov, tipoJuego * juego)
                 case 'q':
                     n = sscanf(comando, "quit%c", &flag_caracter);
                     if (flag_caracter == '\n' && n == 1) {
-                        printf("¿Está seguro que quiere salir (Y/N)? ");
+                        printf("¿Esta seguro que quiere salir (Y/N)? ");
                         if (toupper((caracter = getchar())) == 'Y' && (flag_caracter = getchar()) == '\n') {
                             printf("¿Desea guardar la partida antes de salir (Y/N)? ");
                             if (toupper((caracter = getchar())) == 'Y' && (flag_caracter = getchar()) == '\n') {
@@ -313,9 +313,9 @@ int leer_movimiento(movimiento_t * mov, tipoJuego * juego)
             }
         }
         if(flag_error == FUERA_MATRIZ_1)
-            printf("No existe la posición [%d,%d].\n", mov->origen.x, mov->origen.y);
+            printf("No existe la posicion [%d,%d].\n", mov->origen.x, mov->origen.y);
         else if(flag_error == FUERA_MATRIZ_2)
-            printf("No existe la posición [%d,%d].\n", mov->destino.x, mov->destino.y);
+            printf("No existe la posicion [%d,%d].\n", mov->destino.x, mov->destino.y);
         else if(flag_error != SIN_ERROR && flag_error != NO_PRINT)
             printError(flag_error);
     }while (flag_error && !flag_salir);
@@ -404,8 +404,8 @@ static int leerArchivo(char * nombreArchivo, tipoJuego * juego){
 void printError(int error){
     char * s_errores[]={"No hay error.\n", "Error.\n", "Error en la memoria dinamica.\n", "Error, el archivo de matrices esta mal hecho.\n",
                         "Error, el archivo esta corrupto o no existe.\n", "Error al crear/sobrescribir el archivo. \n", "El archivo esta corrupto o mal escrito.\n",
-                        "Elija otro nombre.\n", "Comando invalido.\n", "El corte no tiene una única variedad de botones.\n",
-                        "Dirección invalida.\n", "El corte no tiene una única variedad de botones.\n", "El nombre del archivo no puede ser nulo.\n",
+                        "Elija otro nombre.\n", "Comando invalido.\n", "El corte no tiene una unica variedad de botones.\n",
+                        "Direccion invalida.\n", "El corte no tiene una unica variedad de botones.\n", "El nombre del archivo no puede ser nulo.\n",
                         "El nombre del archivo es muy largo.\n", "El corte esta compuesto por solo un boton.\n"};
     putchar('\n');
     printf("%s", s_errores[error]);
