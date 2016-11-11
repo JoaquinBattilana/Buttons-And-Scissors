@@ -1,5 +1,5 @@
 # TP
-hackerman
+NO_PRINT TEAM
 
 -Bloque en realloc de sobreesrvibir y abgregar backend, y error si retorna null malloc.
 -Ifndef
@@ -7,5 +7,6 @@ hackerman
 -Ingresar comando doble printeo
 -ver si falta algun define para que quede mas chetin
 -revisado general
-#agkuygjfghkdgfhasdbuilf
-#JOACO TESTEA PUTITA
+
+#SACAR TILDEs
+#PROBAR EN PAMPERO -_-
