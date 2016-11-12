@@ -28,8 +28,10 @@ int jugar(tipoJuego * juego, jugador jugadores[JUGADORES]){
                 estadoError = realizarCortePc(&(juego->tablero), &(jugadores[juego->turno-1].botones_cortados)); //revisar para que tire error de memedim y salga
                 break;
         }
-        if(estadoError != SIN_ERROR)          //RE CONTRA
+        if(estadoError != SIN_ERROR) {         //RE CONTRA
+            printError(estadoError);           //REEEEE
             flag = validar_volvermenu();      //RE REVISAR
+        }
         if(!flag && !hayMovimientosValidos(juego->tablero))
         {
             imprimirTablero(juego->tablero, jugadores);
