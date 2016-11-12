@@ -11,7 +11,7 @@ int jugar(tipoJuego * juego, jugador jugadores[JUGADORES]){
     int flag=0;
     punto_t direccion;
     movimiento_t mov;
-    int estadoError = SIN_ERROR; //REVISAR!!!
+    int estadoError = SIN_ERROR;
     do{
         imprimirTablero(juego->tablero, jugadores);
         printf("Turno jugador %d\n", juego->turno);
@@ -25,12 +25,12 @@ int jugar(tipoJuego * juego, jugador jugadores[JUGADORES]){
                 }
                 break;
             case PC:
-                estadoError = realizarCortePc(&(juego->tablero), &(jugadores[juego->turno-1].botones_cortados)); //revisar para que tire error de memedim y salga
+                estadoError = realizarCortePc(&(juego->tablero), &(jugadores[juego->turno-1].botones_cortados));
                 break;
         }
-        if(estadoError != SIN_ERROR) {         //RE CONTRA
-            printError(estadoError);           //REEEEE
-            flag = validar_volvermenu();      //RE REVISAR
+        if(estadoError != SIN_ERROR) {
+            printError(estadoError);
+            flag = validar_volvermenu();
         }
         if(!flag && !hayMovimientosValidos(juego->tablero))
         {
@@ -71,6 +71,38 @@ int menu()
     } while (flag);
 
     return respuesta-'0';
+}
+
+void imprimirBanner()
+{
+    printf("\n");
+    printf("888888b.            888    888\n");
+    printf("888  \"88b           888    888\n");
+    printf("888  .88P           888    888\n");
+    printf("8888888K.  888  888 888888 888888 .d88b.  88888b.  .d8888b\n");
+    printf("888  \"Y88b 888  888 888    888   d88\"\"88b 888 \"88b 88K\n");
+    printf("888    888 888  888 888    888   888  888 888  888 \"Y8888b.\n");
+    printf("888   d88P Y88b 888 Y88b.  Y88b. Y88..88P 888  888      X88\n");
+    printf("8888888P\"   \"Y88888  \"Y888  \"Y888 \"Y88P\"  888  888  88888P'\n");
+    printf("\n\n");
+    printf("                          888   _       ,/'    sSSSs\n");
+    printf("                          888  (_).  ,/'      S     S\n");
+    printf("                          888   _  ::        S  o o  S\n");
+    printf("    8888b.  88888b.   .d88888  (_)'  `\\.     S       S\n");
+    printf("       \"88b 888 \"88b d88\" 888           `\\.  S  o o  S\n");
+    printf("   .d888888 888  888 888  888                 S     S\n");
+    printf("   888  888 888  888 Y88b 888                  \"sss\"\n");
+    printf("   \"Y888888 888  888  \"Y88888\n");
+    printf("\n\n\n");
+    printf(" .d8888b.           d8b\n");
+    printf("d88P  Y88b          Y8P\n");
+    printf("Y88b.\n");
+    printf(" \"Y888b.    .d8888b 888 .d8888b  .d8888b   .d88b.  888d888 .d8888b\n");
+    printf("    \"Y88b. d88P\"    888 88K      88K      d88\"\"88b 888P\"   88K\n");
+    printf("      \"888 888      888 \"Y8888b. \"Y8888b. 888  888 888     \"Y8888b.\n");
+    printf("Y88b  d88P Y88b.    888      X88      X88 Y88..88P 888          X88\n");
+    printf(" \"Y8888P\"   \"Y8888P 888  88888P'  88888P'  \"Y88P\"  888      88888P'\n\n\n");
+    return;
 }
 
 size_t validar_dim()
@@ -245,16 +277,21 @@ void imprimirTablero(matriz_t tablero, jugador * jugadores) {
     printf("\n   ");
     int i, j;
     for(i = 0; i < tablero.n; i++) //referencia numerica para las columnas
+        printf(" %d", i/10);
+    printf("\n   ");
+
+    for(i = 0; i < tablero.n; i++) //referencia numerica para las columnas
         printf(" %d", i%10);
     i=0;
     printf("\n");
+
     while(i < tablero.n)
     {
         printf("\n");
         for(j = 0; j < tablero.n; j++)
         {
             if(j==0)
-                i>9? printf("%d ", i) : printf("%d  ", i); //referencia numerica para filas
+                i>9? printf("%d ", i) : printf("0%d ", i); //referencia numerica para filas
             printf(" %c", tablero.v[i][j]);
         }
         if(j == tablero.n)

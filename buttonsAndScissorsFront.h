@@ -39,5 +39,6 @@ void printError(int error);
 int guardarJuego(char * nombreArchivo, tipoJuego * juego);
 int validar_volvermenu(void);
 int jugar(tipoJuego * juego, jugador jugadores[JUGADORES]);
+void imprimirBanner();
 
 #endif
