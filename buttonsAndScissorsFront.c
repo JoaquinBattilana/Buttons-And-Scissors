@@ -11,6 +11,7 @@ int jugar(tipoJuego * juego, jugador jugadores[JUGADORES]){
     int flag=0;
     punto_t direccion;
     movimiento_t mov;
+    int estadoError = SIN_ERROR; //REVISAR!!!
     do{
         imprimirTablero(juego->tablero, jugadores);
         printf("Turno jugador %d\n", juego->turno);
@@ -24,9 +25,11 @@ int jugar(tipoJuego * juego, jugador jugadores[JUGADORES]){
                 }
                 break;
             case PC:
-                jugadores[juego->turno-1].botones_cortados += realizarCortePc(&(juego->tablero));
+                estadoError = realizarCortePc(&(juego->tablero), &(jugadores[juego->turno-1].botones_cortados)); //revisar para que tire error de memedim y salga
                 break;
         }
+        if(estadoError != SIN_ERROR)          //RE CONTRA
+            flag = validar_volvermenu();      //RE REVISAR
         if(!flag && !hayMovimientosValidos(juego->tablero))
         {
             imprimirTablero(juego->tablero, jugadores);

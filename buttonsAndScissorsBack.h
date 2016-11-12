@@ -35,14 +35,14 @@ typedef struct
 ** punto de origen, dejando los casilleros que recorre vacios.
 ** Retorna la cantidad de botones cortados.
 */
-int realizarCorte(matriz_t * tablero, movimiento_t mov, punto_t dir);
+int realizarCorte(matriz_t * tablero, movimiento_t movimiento, punto_t direccion);
 
 /*
 ** Dado un movimiento anteriormente validado, se calcula la direccion que debe utilizarse
 ** para ir desde el punto de origen hacia el punto de destino.
 ** Dicha direccion es retornada a traves del parametro de salida 'direccion'.
 */
-void calcularDireccion(movimiento_t mov, punto_t * direccion);
+void calcularDireccion(movimiento_t movimiento, punto_t * direccion);
 
 /*
 ** Dado un tablero, retorna 0 si no quedan movimientos validos por realizar
@@ -54,9 +54,10 @@ int hayMovimientosValidos(matriz_t tablero);
 ** Dado un tablero y habiendo validado que aun hayan movimientos por realizar,
 ** esta funcion realiza un corte, eligiendo entre los de maxima cantidad
 ** de botones o los de minima cantidad de botones pseudoaleatoriamente.
-** Retorna la cantidad de botones cortados.
+** Incrementa los botones cortados por la PC en un parametro de salida.
+** Retorna 0 si no hubo error, o distinto si los hubo.
 */
-int realizarCortePc(matriz_t * tablero);
+int realizarCortePc(matriz_t * tablero, int * btnsPC);
 
 /*
 ** Dado un tablero, un movimiento y una direccion,
@@ -64,12 +65,12 @@ int realizarCortePc(matriz_t * tablero);
 ** entre el putno de origen y el punto de destino
 ** o distinto de 0 si los hay.
 */
-int hayBtnsEntreMedio(matriz_t tablero, movimiento_t puntos, punto_t dir);
+int hayBtnsEntreMedio(matriz_t tablero, movimiento_t movimiento, punto_t direccion);
 
 /*
 ** Dado un movimiento y un tablero, retorna 0 si el movimiento es valido
 ** y distinto de 0 si no lo es.
 */
-int validarMovimiento(movimiento_t * mov, matriz_t tablero);
+int validarMovimiento(movimiento_t * movimiento, matriz_t tablero);
 
 #endif

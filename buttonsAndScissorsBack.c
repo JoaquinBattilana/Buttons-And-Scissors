@@ -3,11 +3,11 @@
 #include "random.h"
 #include "buttonsAndScissorsBack.h"
 
-static movimiento_t * calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, int (*cond)(int,char,char), size_t * dim, movimiento_t * mov_vec);
+static int calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, int (*cond)(int,char,char), size_t * dim, movimiento_t ** pmov_vec);
 static int buscarBoton(matriz_t tablero, punto_t pos);
-static void calcularMovPc(matriz_t tablero, movimiento_t * mov);
+static int calcularMovPc(matriz_t tablero, movimiento_t * mov);
 static int esMovimientoValido(matriz_t tablero, movimiento_t puntos, punto_t dir, int (*cmp)(movimiento_t, char, char));
-static movimiento_t * agregarMovimiento(movimiento_t * mov_vec, movimiento_t mov, size_t * dim);
+static int agregarMovimiento(movimiento_t ** pmov_vec, movimiento_t mov, size_t * dim);
 static int condMovimientoTurno(movimiento_t puntos, char boton, char botonLeido);
 static int condMovimientoJugador(movimiento_t puntos, char boton, char botonLeido);
 static int condMaxMov(int cantBotones, char boton, char botonPosActual);
@@ -156,25 +156,29 @@ int realizarCorte(matriz_t * tablero, movimiento_t mov, punto_t dir)
     return botonesCortados;
 }
 
-int realizarCortePc(matriz_t * tablero)
+int realizarCortePc(matriz_t * tablero, int * btnsPC)
 {
     movimiento_t mov;
-    calcularMovPc(*tablero, &mov);
-    punto_t direccion;
-    calcularDireccion(mov, &direccion);
-    mov.cantBotones = realizarCorte(tablero, mov, direccion);
+    int estadoError = calcularMovPc(*tablero, &mov);
+    if(estadoError == SIN_ERROR)
+    {
+        punto_t direccion;
+        calcularDireccion(mov, &direccion);
+        *btnsPC += realizarCorte(tablero, mov, direccion);
+    }
 
-    return mov.cantBotones;
+    return estadoError;
 }
 
-static void calcularMovPc(matriz_t tablero, movimiento_t * mov)
+static int calcularMovPc(matriz_t tablero, movimiento_t * mov)
 {
+    int estadoError = SIN_ERROR;
     size_t dim = 0;
     movimiento_t * mov_vec = NULL;
     int i=0, j=0;
     int estrategia = randInt(0, 1);
 
-    while(i<tablero.n && j<tablero.n)
+    while(estadoError==SIN_ERROR && i<tablero.n && j<tablero.n)
     {
         if(tablero.v[i][j] != VACIO)
         {
@@ -184,9 +188,9 @@ static void calcularMovPc(matriz_t tablero, movimiento_t * mov)
                 punto_t direccion = {dir_inc[k][0], dir_inc[k][1]};
                 punto_t posActual = {i,j};
                 if(estrategia == 0) //Movimiento Minimo
-                    mov_vec = calcularMovPcEnDir(tablero, posActual, direccion, condMinMov, &dim, mov_vec);
+                     estadoError = calcularMovPcEnDir(tablero, posActual, direccion, condMinMov, &dim, &mov_vec);
                 else                //Movimiento Maximo
-                    mov_vec = calcularMovPcEnDir(tablero, posActual, direccion, condMaxMov, &dim, mov_vec);
+                     estadoError = calcularMovPcEnDir(tablero, posActual, direccion, condMaxMov, &dim, &mov_vec);
 
             }
 
@@ -199,41 +203,45 @@ static void calcularMovPc(matriz_t tablero, movimiento_t * mov)
         }
     }
 
-    int indice = randInt(0, dim-1);
+    if(estadoError == SIN_ERROR)
+    {
+        int indice = randInt(0, dim - 1);
 
-    *mov = mov_vec[indice];
+        *mov = mov_vec[indice];
+    }
 
-    free(mov_vec);
+    if(mov_vec != NULL)
+        free(mov_vec);
 
-    return;
+    return estadoError;
 }
 
 
-static movimiento_t * calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, int (*cond)(int,char,char), size_t * dim, movimiento_t * mov_vec)
+static int calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, int (*cond)(int,char,char), size_t * dim, movimiento_t ** pmov_vec)
 {
-    int i,j, cantBtns = 0;
+    int i,j, cantBtns = 0, estadoError = SIN_ERROR;
     char boton = tablero.v[pos.x][pos.y];
 
-    for(i=pos.x, j=pos.y; i>=0 && i<tablero.n && j>=0 && j<tablero.n && (*cond)(cantBtns, boton, tablero.v[i][j]); i+=dir.x, j+=dir.y)
+    for(i=pos.x, j=pos.y;estadoError == SIN_ERROR && i>=0 && i<tablero.n && j>=0 && j<tablero.n && (*cond)(cantBtns, boton, tablero.v[i][j]); i+=dir.x, j+=dir.y)
     {
         if(tablero.v[i][j] == boton)
         {
             cantBtns++;
             if (cantBtns >= MIN_MOV)
             {
-              if (*dim == 0 || mov_vec[0].cantBotones <= cantBtns)
+              if (*dim == 0 || (*pmov_vec)->cantBotones <= cantBtns)
                 {
-                    if (*dim == 0 || mov_vec[0].cantBotones < cantBtns)
+                    if (*dim == 0 || (*pmov_vec)->cantBotones < cantBtns)
                         *dim = 0;
 
                     movimiento_t mov = {pos, {i, j}, cantBtns};
-                    mov_vec = agregarMovimiento(mov_vec, mov, dim);
+                    estadoError = agregarMovimiento(pmov_vec, mov, dim);
                 }
             }
         }
     }
 
-    return mov_vec;
+    return estadoError;
 }
 
 static int condMinMov(int cantBotones, char boton, char botonPosActual)
@@ -254,12 +262,16 @@ static int condMaxMov(int cantBotones, char boton, char botonPosActual)
     return continuarCiclo;
 }
 
-static movimiento_t * agregarMovimiento(movimiento_t * mov_vec, movimiento_t mov, size_t * dim)
+static int agregarMovimiento(movimiento_t ** pmov_vec, movimiento_t mov, size_t * dim)
 {
+    int estadoError = SIN_ERROR;
     (*dim)++;
-    mov_vec = realloc(mov_vec, *dim * sizeof(*mov_vec)); //OPTIMISTA
+    *pmov_vec = realloc(*pmov_vec, *dim * sizeof(**pmov_vec));
 
-    mov_vec[*dim - 1] = mov;
+    if(*pmov_vec != NULL)
+        (*pmov_vec)[*dim - 1] = mov;
+    else
+        estadoError = E_MEM_DIN;
 
-    return mov_vec;
+    return estadoError;
 }
