@@ -347,9 +347,11 @@ int leer_movimiento(movimiento_t * mov, tipoJuego * juego)
                     n = sscanf(comando, "quit%c", &flag_caracter);
                     if (flag_caracter == '\n' && n == 1) {
                         printf("Esta seguro que quiere salir (Y/N)? ");
-                        if (toupper((caracter = getchar())) == 'Y' && (flag_caracter = getchar()) == '\n') {
+                        fgets(comando, FILENAME_MAX+SAVEGAME+1, stdin);
+                        if (toupper(comando[0]) == 'Y' && comando[1] == '\n') {
                             printf("Desea guardar la partida antes de salir (Y/N)? ");
-                            if (toupper((caracter = getchar())) == 'Y' && (flag_caracter = getchar()) == '\n') {
+                            fgets(comando, FILENAME_MAX+SAVEGAME+1, stdin);
+                            if (toupper(comando[0]) == 'Y' && comando[1] == '\n') {
                                 printf("Ingrese el nombre del archivo: ");
                                 fgets(comando, FILENAME_MAX + 1, stdin);
                                 comando[strlen(comando)-1] = '\0';
@@ -359,17 +361,15 @@ int leer_movimiento(movimiento_t * mov, tipoJuego * juego)
                                     printf("Se ha guardado exitosamente la partida\n");
                                     flag_salir = 1;
                                 }
-                            } else if (toupper(caracter) == 'N' && flag_caracter == '\n')
+                            } else if (toupper(comando[0]) == 'N' && comando[1] == '\n') 
                                 flag_salir = 1;
                             else{
-                                LIMPIAR_BUFFER()
-                                    flag_error = COMANDO_INVALIDO;
+                                flag_error = COMANDO_INVALIDO;
                             }
-                        } else if (toupper(caracter) == 'N' && flag_caracter == '\n')
+                        } else if (toupper(comando[0]) == 'N' && comando[1] == '\n') 
                             flag_salir = 0;
                         else {
-                            LIMPIAR_BUFFER()
-                                flag_error = COMANDO_INVALIDO;
+                            flag_error = COMANDO_INVALIDO;
                         }
                     }
                     break;
