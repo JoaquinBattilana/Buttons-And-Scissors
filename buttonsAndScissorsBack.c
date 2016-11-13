@@ -31,7 +31,7 @@ int validarMovimiento(movimiento_t * mov, matriz_t tablero)
     else if (mov->origen.x == mov->destino.x && mov->origen.y == mov->destino.y) //mismo punto
         flag = MISMO_BOT;
     else if (tablero.v[mov->origen.x][mov->origen.y] !=    tablero.v[mov->destino.x][mov->destino.y])
-        flag = DISTINTO_COLOR;
+        flag = ENTRE_BOTONES;
     else if (mov->origen.x-mov->destino.x != 0)
     {
         pendiente = ((double)mov->destino.y - mov->origen.y)/(mov->destino.x - mov->origen.x);
