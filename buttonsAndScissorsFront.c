@@ -467,11 +467,10 @@ static int leerArchivo(char * nombreArchivo, tipoJuego * juego){
 }
 
 void printError(int error){
-    char * s_errores[]={"No hay error.\n", "Error.\n", "Error en la memoria dinamica.\n", "Error, el archivo de matrices esta mal hecho.\n",
+    char * s_errores[]={"No hay error.\n", "Error en la memoria dinamica.\n", "Error, el archivo de matrices esta mal hecho.\n",
                         "Error, el archivo esta corrupto o no existe.\n", "Error al crear/sobrescribir el archivo. \n", "El archivo esta corrupto o mal escrito.\n",
-                        "Elija otro nombre.\n", "Comando invalido.\n", "El corte no tiene una unica variedad de botones.\n",
-                        "Direccion invalida.\n", "El corte no tiene una unica variedad de botones.\n", "El nombre del archivo no puede ser nulo.\n",
-                        "El nombre del archivo es muy largo.\n", "El corte esta compuesto por solo un boton.\n"};
+                        "Comando invalido.\n", "Direccion invalida.\n", "El corte no tiene una unica variedad de botones.\n",
+                        "El corte esta compuesto por solo un boton.\n"};
     putchar('\n');
     printf("%s", s_errores[error]);
     putchar('\n');
