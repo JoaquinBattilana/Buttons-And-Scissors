@@ -265,9 +265,9 @@ static int condMaxMov(int cantBotones, char boton, char botonPosActual)
 static int agregarMovimiento(movimiento_t ** pmov_vec, movimiento_t mov, size_t * dim)
 {
     int estadoError = SIN_ERROR;
+    if(*dim%BLOQUE_MEM == 0)
+        *pmov_vec = realloc(*pmov_vec, (*dim + BLOQUE_MEM) * sizeof(**pmov_vec));
     (*dim)++;
-    *pmov_vec = realloc(*pmov_vec, *dim * sizeof(**pmov_vec));
-
     if(*pmov_vec != NULL)
         (*pmov_vec)[*dim - 1] = mov;
     else
