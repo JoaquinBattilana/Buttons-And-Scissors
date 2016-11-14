@@ -1,6 +1,6 @@
-#ifndef _BUTTONS_AND_SCISSORS_BACK
+#ifndef BUTTONS_AND_SCISSORS_BACK
 
-#define _BUTTONS_AND_SCISSORS_BACK
+#define BUTTONS_AND_SCISSORS_BACK
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -12,8 +12,12 @@
 #define BLOQUE_MEM 10
 
 enum errores {SIN_ERROR=0, E_MEM_DIN,E_ARCHIVO_MATRICES,E_ABRIR_ARCHIVO,
-    E_CREAR_ARCHIVO, E_ARCHIVO_MAL,COMANDO_INVALIDO,DIR_INVALIDA,ENTRE_BOTONES,MISMO_BOT,FUERA_MATRIZ_1,FUERA_MATRIZ_2,NO_PRINT};
+              E_CREAR_ARCHIVO, E_ARCHIVO_MAL,COMANDO_INVALIDO,DIR_INVALIDA,
+              ENTRE_BOTONES,MISMO_BOT,FUERA_MATRIZ_1,FUERA_MATRIZ_2,NO_PRINT};
 
+/*
+** Esta estrucura representa el tablero, siendo v la matriz y n su dimension.
+*/
 typedef struct
 {
     char ** v;
@@ -78,12 +82,12 @@ int hayBtnsEntreMedio(matriz_t tablero, movimiento_t movimiento, punto_t direcci
 int validarMovimiento(movimiento_t * movimiento, matriz_t tablero);
 
 /*
-**Habilita memoria dinamica para nxn chars y devuelve el puntero a esa posicion
+** Habilita memoria dinamica para nxn chars y devuelve el puntero a esa posicion.
 */
 char ** creaMatrizCuadrada(size_t n);
 
 /*
-**Libera la matriz cuadrada
+** Libera la matriz cuadrada.
 */
 void liberarMatrizCuadrada(matriz_t tablero);
 

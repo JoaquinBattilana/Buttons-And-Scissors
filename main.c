@@ -5,7 +5,7 @@ int main(void){
     randomize(); //setea semilla
     int opcion,salir=0,error=SIN_ERROR;
     tipoJuego juego;
-    jugador jugadores[JUGADORES] = {};
+    jugador jugadores[JUGADORES] = {{0}};
     do{
         opcion=menu();
         switch(opcion){

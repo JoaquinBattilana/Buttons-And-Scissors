@@ -1,16 +1,64 @@
 #include "buttonsAndScissorsBack.h"
 
+/*
+** Dada una direccion y una condicion, busca movimientos en dicha direccion.
+** De ser necesario editara el vector que almacena los movimientos.
+** Retorna en su nombre el estado de error.
+*/
 static int calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, int (*cond)(int,char,char), size_t * dim, movimiento_t ** pmov_vec);
+
+/*
+** Pasa por todas las direcciones de busqueda invocando a la funcion esMovimientoValido
+** hasta que esta ultima retorne 1 avisando que encontro dicho un movimiento a realizar.
+*/
 static int buscarBoton(matriz_t tablero, punto_t pos);
+
+/*
+** Busca segun una estrategia elegida aleatoriamente (elige entre mov maximo y mov minimo)
+** retornando en una variable de salida un movimiento valido para realizar.
+** Retorna en su nombre el estado de error.
+*/
 static int calcularMovPc(matriz_t tablero, movimiento_t * mov);
+
+/*
+** Dado un movimiento, una direccion y una condicion, retorna 0 si el movimiento es invalido
+** o 1 si el movimiento es valido.
+*/
 static int esMovimientoValido(matriz_t tablero, movimiento_t puntos, punto_t dir, int (*cmp)(movimiento_t, char, char));
+
+/*
+** Inserta el movimiento dado en el vector de movimientos al que apunta pmov_vec,
+** segun el caso agregara o sobreescribira el vector. Retorna el estado de error.
+*/
 static int agregarMovimiento(movimiento_t ** pmov_vec, movimiento_t mov, size_t * dim);
+
+/*
+** Condicion de corte del ciclo for para cuando se busca un movimiento valido, apenas encuentra uno, corta.
+*/
 static int condMovimientoTurno(movimiento_t puntos, char boton, char botonLeido);
+
+/*
+** Condicion de corte del ciclo for para ver si un movimiento del jugador es valido.
+*/
 static int condMovimientoJugador(movimiento_t puntos, char boton, char botonLeido);
+
+/*
+** Retornan 0 si se cumple la condicion de corte del ciclo for para la estategia de mov maximo,
+** y retorna 1 si se debe seguir el ciclo.
+*/
 static int condMaxMov(int cantBotones, char boton, char botonPosActual);
+
+/*
+** Retornan 0 si se cumple la condicion de corte del ciclo for para la estategia de mov minimo,
+** y retorna 1 si se debe seguir el ciclo.
+*/
 static int condMinMov(int cantBotones, char boton, char botonPosActual);
 
-static char dir_inc[INC_MAX][2] = {{0,1},{1,1},{1,0},{1,-1}}; //incremento direcciones DERECHA, D_ABAJO, ABAJO, I_ABAJO
+/*
+** Vector estatico con incremento en direcciones (DERECHA, D_ABAJO, ABAJO, I_ABAJO).
+*/
+static char dir_inc[INC_MAX][2] = {{0,1},{1,1},{1,0},{1,-1}};
+
 
 int hayBtnsEntreMedio(matriz_t tablero, movimiento_t puntos, punto_t dir)
 { 
@@ -27,7 +75,7 @@ int validarMovimiento(movimiento_t * mov, matriz_t tablero)
         flag = FUERA_MATRIZ_1;
     else if (mov->origen.x == mov->destino.x && mov->origen.y == mov->destino.y) //mismo punto
         flag = MISMO_BOT;
-    else if (tablero.v[mov->origen.x][mov->origen.y] !=    tablero.v[mov->destino.x][mov->destino.y])
+    else if (tablero.v[mov->origen.x][mov->origen.y] != tablero.v[mov->destino.x][mov->destino.y])
         flag = ENTRE_BOTONES;
     else if (mov->origen.x-mov->destino.x != 0)
     {
@@ -46,7 +94,7 @@ int validarMovimiento(movimiento_t * mov, matriz_t tablero)
     return flag;
 }
 
-int hayMovimientosValidos(matriz_t tablero) //se invoca luego de cada turno para saber si hay un ganador
+int hayMovimientosValidos(matriz_t tablero)
 {
     int flag = 0;
     int i=0, j=0;

@@ -1,7 +1,8 @@
 #include "buttonsAndScissorsBack.h"
 #include "buttonsAndScissorsFront.h"
 
-/* se le pasa un numero pseudoaleatorio(n) de maximo el numero de matrices, un archivo
+/*
+** Se le pasa un numero pseudoaleatorio(n) de maximo el numero de matrices, un archivo
 ** y la dimension de las matrices, busca la numero n y 
 ** y deja el cursor en el principio
 */
@@ -12,7 +13,9 @@ static int buscarMatriz(FILE * archivo, int random, size_t n);
 ** dinamica y guarda ahi la matriz del archivo
 */
 static int escribirMatriz(FILE * archivo, char ** matriz, size_t n);
-/*Desde un archivo de nombreArchivo carga en la estructura juego el juego actual que lee
+
+/*
+** Desde un archivo de nombreArchivo carga en la estructura juego el juego actual que lee
 ** desde el archivo.
 */
 static int leerArchivo(char * nombreArchivo, tipoJuego * juego);
@@ -53,7 +56,7 @@ int jugar(tipoJuego * juego, jugador jugadores[JUGADORES]){
             juego->turno = (juego->turno)%JUGADORES+1;
     }while (!flag);
 
-    return flag%2;
+    return flag%2; //ya que cuando flag vale 2 o 0 debe retornar 0
 }
 
 
@@ -178,7 +181,7 @@ int matrizDsdArchivo(tipoJuego * juego){
     int error=SIN_ERROR;
     int c,random;
     char nombreArchivo[10], whitespace=0;
-    sprintf(nombreArchivo, "./%ldx%ld", juego->tablero.n,juego->tablero.n );
+    sprintf(nombreArchivo, "./%ldx%ld", juego->tablero.n,juego->tablero.n);
     char ** aux=NULL;
     FILE * archivo;
     archivo = fopen(nombreArchivo, "r");
@@ -202,12 +205,15 @@ int matrizDsdArchivo(tipoJuego * juego){
                         error = E_ARCHIVO_MATRICES;
                         liberarMatrizCuadrada(tablero);
                     }
-                    else{
+                    else
+                    {
                         if(random<c)
+                        {
                             if(fgetc(archivo)=='-' && fgetc(archivo) == '\n')
                                 error = buscarMatriz(archivo, c-random, juego->tablero.n); //esto lo hacemos para validar lo que queda del archivo, por el formato.
                             else
                                 error=E_ARCHIVO_MATRICES;
+                        }
                         if(error)
                             liberarMatrizCuadrada(tablero);
                         juego->tablero.v=aux;
@@ -296,7 +302,7 @@ void imprimirTablero(matriz_t tablero, jugador * jugadores) {
 
 int leer_movimiento(movimiento_t * mov, tipoJuego * juego)
 {
-    int flag_caracter, caracter;
+    int flag_caracter;
     char flag_salir = 0, comando[FILENAME_MAX+SAVEGAME+1];
     int flag_error, n;
     do
@@ -312,7 +318,7 @@ int leer_movimiento(movimiento_t * mov, tipoJuego * juego)
                 case '[':
                     n = sscanf(comando, "[%2d,%2d] [%2d,%2d]%c", &mov->origen.x, &mov->origen.y, &mov->destino.x,
                                &mov->destino.y,
-                               &flag_caracter);
+                               (char *)&flag_caracter);
                     if (flag_caracter == '\n' && n == 5)
                         flag_error = validarMovimiento(mov, juego->tablero);
                     else {
@@ -320,7 +326,7 @@ int leer_movimiento(movimiento_t * mov, tipoJuego * juego)
                     }
                     break;
                 case 's':
-                    n = sscanf(comando, "savegame%c", &flag_caracter);
+                    n = sscanf(comando, "savegame%c", (char *)&flag_caracter);
                     if (n == 1 && flag_caracter == ' ') {
                         comando[strlen(comando)-1] = '\0';
                         flag_error = guardarJuego(comando + 9, juego);
@@ -336,7 +342,7 @@ int leer_movimiento(movimiento_t * mov, tipoJuego * juego)
                     }
                     break;
                 case 'q':
-                    n = sscanf(comando, "quit%c", &flag_caracter);
+                    n = sscanf(comando, "quit%c", (char *)&flag_caracter);
                     if (flag_caracter == '\n' && n == 1) {
                         printf("Esta seguro que quiere salir (Y/N)? ");
                         fgets(comando, FILENAME_MAX+SAVEGAME+1, stdin);

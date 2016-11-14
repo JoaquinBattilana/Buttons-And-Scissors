@@ -1,5 +1,7 @@
 FLAGS = -Wall -pedantic -std=c99
+EXEC_NAME = tpe.exe
 all:
-	gcc -o tpe.exe main.c buttonsAndScissorsBack.h buttonsAndScissorsBack.c buttonsAndScissorsFront.h buttonsAndScissorsFront.c random.h random.c $(FLAGS)
+	gcc -o $(EXEC_NAME) main.c buttonsAndScissorsBack.h buttonsAndScissorsBack.c buttonsAndScissorsFront.h buttonsAndScissorsFront.c random.h random.c $(FLAGS)
+
 clean:
-	rm tpe.exe
+	rm $(EXEC_NAME)

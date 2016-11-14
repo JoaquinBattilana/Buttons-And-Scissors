@@ -1,6 +1,6 @@
-#ifndef TPE_BUTTONSANDSCISSORSFRONT_H
+#ifndef BUTTONSANDSCISSORSFRONT_H
 
-#define TPE_BUTTONSANDSCISSORSFRONT_H
+#define BUTTONSANDSCISSORSFRONT_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,10 +22,10 @@ typedef struct{
     int esPC;
 }jugador;
 
-/*Esta estructura es el juego en si, que contiene el tablero, el modo de juego(0 para jugar contra otro jugador, 1 para jugar 
+/*
+** Estructura que contiene el tablero, el modo de juego(0 para jugar contra otro jugador, 1 para jugar
 ** contra la pc) y el turno actual del jugador)
 */
-
 typedef struct tipoJuego{
     matriz_t tablero;
     int modoJuego;
@@ -56,10 +56,10 @@ int matrizDsdArchivo(tipoJuego * juego);
 */
 void imprimirTablero(matriz_t tablero, jugador * jugadores);
 
-/*Carga un juego guardado en la estructura juego para poder seguir jugando, devuelve error si el archivo no esta con 
+/*
+** Carga un juego guardado en la estructura juego para poder seguir jugando, devuelve error si el archivo no esta con
 ** el formato de la catedra o no existe.
 */
-
 int cargarJuego(tipoJuego * juego);
 
 /*
@@ -72,10 +72,12 @@ int leer_movimiento(movimiento_t * mov, tipoJuego * juego);
 ** Dado un numero imprime el correspondiente error.
 */
 void printError(int error);
-/* Guarda el juego en un archivo con el nombre del vector nombreArchivo. El guardado se hace con el formato de la catedra
-**, si no pudo guardar devuelve error
-*/
 
+/*
+** Guarda el juego en un archivo con el nombre del vector nombreArchivo.
+** El guardado se hace con el formato de la catedra.
+** Si no pudo guardar devuelve error
+*/
 int guardarJuego(char * nombreArchivo, tipoJuego * juego);
 
 /*
@@ -90,7 +92,7 @@ int validar_volvermenu(void);
 int jugar(tipoJuego * juego, jugador jugadores[JUGADORES]);
 
 /*
-** Imprime botones y tijeras en asii.
+** Imprime portada que dice 'Buttons And Scissors'.
 */
 void imprimirBanner();
 
