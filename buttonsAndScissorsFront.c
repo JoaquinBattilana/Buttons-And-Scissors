@@ -3,8 +3,6 @@
 
 static int buscarMatriz(FILE * archivo, int random, size_t n);
 static int escribirMatriz(FILE * archivo, char ** matriz, size_t n);
-static char ** creaMatrizCuadrada(size_t n);
-static void liberarMatrizCuadrada(matriz_t tablero);
 static int leerArchivo(char * nombreArchivo, tipoJuego * juego);
 
 int jugar(tipoJuego * juego, jugador jugadores[JUGADORES]){
