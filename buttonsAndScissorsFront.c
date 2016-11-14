@@ -1,6 +1,7 @@
 #include "buttonsAndScissorsBack.h"
 #include "buttonsAndScissorsFront.h"
 
+
 /* se le pasa un numero pseudoaleatorio(n) de maximo el numero de matrices, un archivo
 ** y la dimension de las matrices, busca la numero n y 
 ** y deja el cursor en el principio
@@ -12,6 +13,11 @@ static int buscarMatriz(FILE * archivo, int random, size_t n);
 ** dinamica y guarda ahi la matriz del archivo
 */
 static int escribirMatriz(FILE * archivo, char ** matriz, size_t n);
+/* habilita memoria dinamica para nxn chars y devuelve el puntero a esa posicion
+*/
+static char ** creaMatrizCuadrada(size_t n);
+/* libera la matriz cuadrada*/
+static void liberarMatrizCuadrada(char ** matriz);
 /*Desde un archivo de nombreArchivo carga en la estructura juego el juego actual que lee
 ** desde el archivo.
 */
@@ -46,7 +52,7 @@ int jugar(tipoJuego * juego, jugador jugadores[JUGADORES]){
         {
             imprimirTablero(juego->tablero, jugadores);
             printf("Gano el jugador %d\n", juego->turno);
-            liberarMatrizCuadrada(juego->tablero);
+            liberarMatrizCuadrada(juego->tablero.v);
             flag = validar_volvermenu();
         }
         else
@@ -197,16 +203,16 @@ int matrizDsdArchivo(tipoJuego * juego){
                     error = E_MEM_DIN;
                 else {
                     error = escribirMatriz(archivo, aux, juego->tablero.n);
-                    matriz_t tablero = {aux, juego->tablero.n};
                     if (error) {
                         error = E_ARCHIVO_MATRICES;
-                        liberarMatrizCuadrada(tablero);
+                        matriz_t matriz = {aux, juego->tablero.n};
+                        liberarMatrizCuadrada(aux);
                     }
                     else{
                         if(c-random)
                             error = buscarMatriz(archivo, c-random, juego->tablero.n); //esto lo hacemos para validar lo que queda del archivo, por el formato.
                         if(error)
-                            liberarMatrizCuadrada(tablero);
+                            liberarMatrizCuadrada(aux);
                         juego->tablero.v=aux;
                     }
                 }
@@ -437,7 +443,7 @@ static int leerArchivo(char * nombreArchivo, tipoJuego * juego){
                                     juego->tablero.v[i][j] = VACIO;
                                 else {
                                     error = E_ARCHIVO_MAL;
-                                    liberarMatrizCuadrada(juego->tablero);
+                                    liberarMatrizCuadrada(juego->tablero.v);
                                 }
                             }
                         }

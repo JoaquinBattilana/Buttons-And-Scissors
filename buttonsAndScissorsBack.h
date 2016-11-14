@@ -2,10 +2,7 @@
 
 #define _BUTTONS_AND_SCISSORS_BACK
 
-#include <stdlib.h>
-#include <stdio.h>
-#include "random.h"
-
+#include "stdlib.h"
 #define INC_MAX 4
 #define VACIO ' '
 #define MIN_MOV 2
@@ -76,15 +73,5 @@ int hayBtnsEntreMedio(matriz_t tablero, movimiento_t movimiento, punto_t direcci
 ** y distinto de 0 si no lo es.
 */
 int validarMovimiento(movimiento_t * movimiento, matriz_t tablero);
-
-/*
-**Habilita memoria dinamica para nxn chars y devuelve el puntero a esa posicion
-*/
-char ** creaMatrizCuadrada(size_t n);
-
-/*
-**Libera la matriz cuadrada
-*/
-void liberarMatrizCuadrada(matriz_t tablero);
 
 #endif
