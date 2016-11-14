@@ -22,6 +22,10 @@ typedef struct{
     int esPC;
 }jugador;
 
+/*Esta estructura es el juego en si, que contiene el tablero, el modo de juego(0 para jugar contra otro jugador, 1 para jugar 
+** contra la pc) y el turno actual del jugador)
+*/
+
 typedef struct tipoJuego{
     matriz_t tablero;
     int modoJuego;
@@ -41,12 +45,20 @@ int menu();
 */
 size_t validar_dim();
 
+/*Se le pasa la estructura del juego y devuelve cargado la matriz. La matriz se carga desde un archivo de texto plano
+** con el nombre de la dimension siguiendo el formato de la catedra
+** . Devuelve error si el archivo no existe o tiene otro formato.
+*/
 int matrizDsdArchivo(tipoJuego * juego);
 
 /*
 ** Imprime la cantidad de botones cortados por jugador y el tablero.
 */
 void imprimirTablero(matriz_t tablero, jugador * jugadores);
+
+/*Carga un juego guardado en la estructura juego para poder seguir jugando, devuelve error si el archivo no esta con 
+** el formato de la catedra o no existe.
+*/
 
 int cargarJuego(tipoJuego * juego);
 
@@ -60,6 +72,9 @@ int leer_movimiento(movimiento_t * mov, tipoJuego * juego);
 ** Dado un numero imprime el correspondiente error.
 */
 void printError(int error);
+/* Guarda el juego en un archivo con el nombre del vector nombreArchivo. El guardado se hace con el formato de la catedra
+**, si no pudo guardar devuelve error
+*/
 
 int guardarJuego(char * nombreArchivo, tipoJuego * juego);
 
