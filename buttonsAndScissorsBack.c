@@ -12,8 +12,9 @@ static int condMovimientoTurno(movimiento_t puntos, char boton, char botonLeido)
 static int condMovimientoJugador(movimiento_t puntos, char boton, char botonLeido);
 static int condMaxMov(int cantBotones, char boton, char botonPosActual);
 static int condMinMov(int cantBotones, char boton, char botonPosActual);
-
 static char dir_inc[INC_MAX][2] = {{0,1},{1,1},{1,0},{1,-1}}; //incremento direcciones DERECHA, D_ABAJO, ABAJO, I_ABAJO
+static char ** creaMatrizCuadrada(size_t n);
+static void liberarMatrizCuadrada(matriz_t tablero);
 
 int hayBtnsEntreMedio(matriz_t tablero, movimiento_t puntos, punto_t dir)
 { 
