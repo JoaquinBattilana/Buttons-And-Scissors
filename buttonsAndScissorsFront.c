@@ -1,8 +1,20 @@
 #include "buttonsAndScissorsBack.h"
 #include "buttonsAndScissorsFront.h"
 
+/* se le pasa un numero pseudoaleatorio(n) de maximo el numero de matrices, un archivo
+** y la dimension de las matrices, busca la numero n y 
+** y deja el cursor en el principio
+*/
 static int buscarMatriz(FILE * archivo, int random, size_t n);
+
+/* se le pasa una matriz en la que se quiere escribir desde un archivo, el archivo
+** y la dimension. Desde el archivo en la posicion actual verifica, habilita memoria
+** dinamica y guarda ahi la matriz del archivo
+*/
 static int escribirMatriz(FILE * archivo, char ** matriz, size_t n);
+/*Desde un archivo de nombreArchivo carga en la estructura juego el juego actual que lee
+** desde el archivo.
+*/
 static int leerArchivo(char * nombreArchivo, tipoJuego * juego);
 
 int jugar(tipoJuego * juego, jugador jugadores[JUGADORES]){
@@ -164,7 +176,7 @@ int validar_volvermenu(void)
 
 int matrizDsdArchivo(tipoJuego * juego){
     int error=SIN_ERROR;
-    int c;
+    int c,random;
     char nombreArchivo[10], whitespace=0;
     sprintf(nombreArchivo, "./%ldx%ld", juego->tablero.n,juego->tablero.n );
     char ** aux=NULL;
@@ -176,19 +188,25 @@ int matrizDsdArchivo(tipoJuego * juego){
             error = E_ARCHIVO_MATRICES;
         }
         else {
-            error = buscarMatriz(archivo,randInt(1,c), juego->tablero.n);
+            random=randInt(1,c);
+            error = buscarMatriz(archivo,random, juego->tablero.n);
             if (!error) {
+                random++;
                 aux = creaMatrizCuadrada(juego->tablero.n);
                 if (aux == NULL)
                     error = E_MEM_DIN;
                 else {
+                    matriz_t matriz = {aux, juego->tablero.n};
                     error = escribirMatriz(archivo, aux, juego->tablero.n);
                     if (error) {
                         error = E_ARCHIVO_MATRICES;
-                        matriz_t matriz = {aux, juego->tablero.n};
                         liberarMatrizCuadrada(matriz);
                     }
                     else{
+                        if(c-random)
+                            error = buscarMatriz(archivo, c-random, juego->tablero.n); //esto lo hacemos para validar lo que queda del archivo, por el formato.
+                        if(error)
+                            liberarMatrizCuadrada(matriz);
                         juego->tablero.v=aux;
                     }
                 }
