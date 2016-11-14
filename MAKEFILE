@@ -1,0 +1,15 @@
+COMPILER=gcc
+DEBUG_COMPILER=-g -DDEBUG=1
+OUTPUT_FILE=TP_DAMMIANO
+
+all: back.o
+  $(COMPILER) -o $(OUTPUT_FILE) main.c buttonsAndScissorsFront.h buttonsAndScissorsFront.c buttonsAndScissorsBack.o
+
+debug: COMPILER+=$(DEBUG_COMPILER)
+debug: all
+
+back.o: buttonsAndScissorsBack.h buttonsAndScissorsBack.c
+  $(COMPILER) -c buttonsAndScissorsBack.h buttonsAndScissorsBack.c
+
+clean:
+  rm -r $(OUTPUT_FILE) *.o *.h.gch
