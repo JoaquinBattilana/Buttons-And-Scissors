@@ -85,6 +85,6 @@ char ** creaMatrizCuadrada(size_t n);
 /*
 **Libera la matriz cuadrada
 */
-void liberarMatrizCuadrada(char ** matriz);
+void liberarMatrizCuadrada(matriz_t tablero);
 
 #endif

@@ -46,7 +46,7 @@ int jugar(tipoJuego * juego, jugador jugadores[JUGADORES]){
         {
             imprimirTablero(juego->tablero, jugadores);
             printf("Gano el jugador %d\n", juego->turno);
-            liberarMatrizCuadrada(juego->tablero.v);
+            liberarMatrizCuadrada(juego->tablero);
             flag = validar_volvermenu();
         }
         else
@@ -197,16 +197,16 @@ int matrizDsdArchivo(tipoJuego * juego){
                     error = E_MEM_DIN;
                 else {
                     error = escribirMatriz(archivo, aux, juego->tablero.n);
+                    matriz_t tablero = {aux, juego->tablero.n};
                     if (error) {
                         error = E_ARCHIVO_MATRICES;
-                        matriz_t matriz = {aux, juego->tablero.n};
-                        liberarMatrizCuadrada(aux);
+                        liberarMatrizCuadrada(tablero);
                     }
                     else{
                         if(c-random)
                             error = buscarMatriz(archivo, c-random, juego->tablero.n); //esto lo hacemos para validar lo que queda del archivo, por el formato.
                         if(error)
-                            liberarMatrizCuadrada(aux);
+                            liberarMatrizCuadrada(tablero);
                         juego->tablero.v=aux;
                     }
                 }
@@ -437,7 +437,7 @@ static int leerArchivo(char * nombreArchivo, tipoJuego * juego){
                                     juego->tablero.v[i][j] = VACIO;
                                 else {
                                     error = E_ARCHIVO_MAL;
-                                    liberarMatrizCuadrada(juego->tablero.v);
+                                    liberarMatrizCuadrada(juego->tablero);
                                 }
                             }
                         }
