@@ -245,33 +245,6 @@ static int escribirMatriz(FILE * archivo, char ** matriz, size_t n){
     return error;
 }
 
-
-static char ** creaMatrizCuadrada(size_t n){
-    int i,flag,j;
-    char ** aux=NULL;
-    aux=malloc(sizeof(*aux)*n);
-    if(aux!=NULL){
-        for (i=0, flag=1; i<n && flag; i++){
-            aux[i]=malloc(sizeof(**aux)*n);
-            if(aux[i]==NULL){
-                flag=0;
-                for(j=i-1;j>=0; j--)
-                    free(aux[j]);
-                free(aux);
-            }
-        }
-    }
-    return aux;
-}
-
-static void liberarMatrizCuadrada(matriz_t tablero){
-    int i;
-    for(i=0; i<tablero.n; i++)
-        free(tablero.v[i]);
-    free(tablero.v);
-    return;
-}
-
 void imprimirTablero(matriz_t tablero, jugador * jugadores) {
     printf("Botones J1: %d, J2: %d\n", jugadores[0].botones_cortados, jugadores[1].botones_cortados);
     printf("\n   ");
