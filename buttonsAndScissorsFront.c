@@ -1,7 +1,6 @@
 #include "buttonsAndScissorsBack.h"
 #include "buttonsAndScissorsFront.h"
 
-
 /* se le pasa un numero pseudoaleatorio(n) de maximo el numero de matrices, un archivo
 ** y la dimension de las matrices, busca la numero n y 
 ** y deja el cursor en el principio
@@ -13,11 +12,6 @@ static int buscarMatriz(FILE * archivo, int random, size_t n);
 ** dinamica y guarda ahi la matriz del archivo
 */
 static int escribirMatriz(FILE * archivo, char ** matriz, size_t n);
-/* habilita memoria dinamica para nxn chars y devuelve el puntero a esa posicion
-*/
-static char ** creaMatrizCuadrada(size_t n);
-/* libera la matriz cuadrada*/
-static void liberarMatrizCuadrada(char ** matriz);
 /*Desde un archivo de nombreArchivo carga en la estructura juego el juego actual que lee
 ** desde el archivo.
 */
