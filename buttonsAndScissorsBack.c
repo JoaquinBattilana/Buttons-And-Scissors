@@ -1,6 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include "random.h"
 #include "buttonsAndScissorsBack.h"
 
 static int calcularMovPcEnDir(matriz_t tablero, punto_t pos, punto_t dir, int (*cond)(int,char,char), size_t * dim, movimiento_t ** pmov_vec);
@@ -276,7 +273,8 @@ static int agregarMovimiento(movimiento_t ** pmov_vec, movimiento_t mov, size_t 
     return estadoError;
 }
 
-static char ** creaMatrizCuadrada(size_t n){
+char ** creaMatrizCuadrada(size_t n)
+{
     int i,flag,j;
     char ** aux=NULL;
     aux=malloc(sizeof(*aux)*n);
@@ -294,7 +292,8 @@ static char ** creaMatrizCuadrada(size_t n){
     return aux;
 }
 
-static void liberarMatrizCuadrada(matriz_t tablero){
+void liberarMatrizCuadrada(matriz_t tablero)
+{
     int i;
     for(i=0; i<tablero.n; i++)
         free(tablero.v[i]);
